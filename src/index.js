@@ -4,8 +4,6 @@ import App from "./App";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
-import "./tailwind.css";
-
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_APP_KEY,
     authDomain: process.env.FIREBASE_AUTH_DOMAIN,
