@@ -1,56 +1,77 @@
-import { Text, Center, Square, Circle, Box, Link as ChakraLink, HStack } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Box, Text, HStack, Link as ChakraLink, Image } from "@chakra-ui/react";
 import React from "react";
+import { Link as RouterLink } from "react-router-dom";
 
-const Linker = ({ text, linkTo }) => (
-    <Square w="80px" h="80px">
-        <ChakraLink as={Link} to={linkTo}>
-            <Text fontSize={"20px"} fontWeight={"bold"}>{text}</Text>
+const NavLinker = ({to, text}) => {
+    return (
+        <ChakraLink
+            as={RouterLink}
+            to={to}
+            fontWeight="bold"
+            fontSize="large"
+        >
+            {text}
         </ChakraLink>
-    </Square>
-)
+    );
+};
+
+const ProfileBox = ({ image, name }) => {
+    return (
+        <HStack>
+            <ChakraLink as={RouterLink} to="/">{name}</ChakraLink>
+            <Image 
+                borderRadius='full'
+                boxSize='50px'
+                src= {image == null ? 'https://bit.ly/dan-abramov' : image}
+                alt='Dan Abramov'
+            />
+        </HStack>
+    )
+}
 
 const NavBar = () => {
-    return(
-        <Center
-            position={"fixed"}
-            bg={"#006769"} 
-            textColor={"white"} 
-            w={"100vw"}
-            h={"8em"}
+    return (
+        <Box
+            zIndex="1"
+            margin="0"
+            w="100vw"
+            h="5em"
+            position="fixed"
+            display="flex"
         >
-            <HStack
-                w={"50vw"}
-                h="auto"
-                justify={"start"}
-                paddingLeft={"52px"}
+            <HStack 
+                w="100vw"
+                border="1px solid red"
+                position="relative"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                paddingX="2rem"
             >
                 <Text
-                    textAlign={"center"}
-                    fontWeight={"bold"}
-                    fontSize={"34px"}
+                    marginRight="65em"
+                    size="xl"
+                    fontWeight="bold"
                 >
-                    LETTER LIKE
+                    LETTERLIKE
                 </Text>
-            </HStack>
-            <HStack 
-                w={"50vw"}
-                h="auto"
-                justify={"end"}
-            >
-                <Linker text={"SEND"} linkTo={"/send"}/>
-                <Linker text={"MAIL"} linkTo={"/mail"} />
-                <Linker text={"LOGIN"} linkTo={"/login"} />
-                <Center
-                    padding={"4rem"}
+                <HStack
+                    position="relative"
+                    spacing="2em"
+                    display="flex"
+                    justifyContent="right"
+                    alignItems="center"
                 >
-                    <HStack>
-                        <Text textAlign={"center"} fontWeight={"bold"} fontSize={"20px"}>NAME</Text>
-                        <Circle marginLeft={"15px"} w="4em" h="4em" bg={"white"}></Circle>
-                    </HStack>
-                </Center>
+                    <NavLinker to="/mail" text="MAIL" />
+                    <NavLinker to="/send" text="SEND" />
+                    <NavLinker to="/template" text="TEMPLATE" />
+                    <NavLinker to="/login" text="LOGIN" />
+
+                    {/* 프로필 박스 */}
+                    <ProfileBox name="Dan Albert" />
+                </HStack>
             </HStack>
-        </Center>
+        </Box>
     );
 };
 
