@@ -1,7 +1,6 @@
 import React from "react";
-import NavBar from "../../components/navbar/NavBar";
-import { Box, Text, VStack, HStack, Heading, Button, UnorderedList, ListItem, Image, SimpleGrid, Icon, createIcon } from "@chakra-ui/react";
-import { AtSignIcon, EmailIcon, PhoneIcon } from "@chakra-ui/icons";
+import { Box, Text, VStack, HStack, Heading, Button, UnorderedList, ListItem, Image, SimpleGrid } from "@chakra-ui/react";
+import { EmailIcon, PhoneIcon } from "@chakra-ui/icons";
 
 const IconTextBox = ({Icon, subtitle, context}) => (
   <VStack
@@ -85,8 +84,9 @@ const DescriptionTextFormats = ({title, description, list, Button}) => {
         spacing="8px"
       >
         {
-          list.map((elm) => (
+          list.map((elm, index) => (
             <ListItem
+              key={index}
               color="gray"
             >
               {elm}
