@@ -38,10 +38,10 @@ const NavBar = () => {
             h="5em"
             position="fixed"
             display="flex"
+            bgColor="white"
         >
             <HStack 
                 w="100vw"
-                border="1px solid red"
                 position="relative"
                 display="flex"
                 justifyContent="center"

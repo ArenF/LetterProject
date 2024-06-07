@@ -1,6 +1,35 @@
 import React from "react";
 import NavBar from "../../components/navbar/NavBar";
-import { Box, Text, VStack, HStack, Heading, Button, UnorderedList, ListItem, Image } from "@chakra-ui/react";
+import { Box, Text, VStack, HStack, Heading, Button, UnorderedList, ListItem, Image, SimpleGrid, Icon, createIcon } from "@chakra-ui/react";
+import { AtSignIcon, EmailIcon, PhoneIcon } from "@chakra-ui/icons";
+
+const IconTextBox = ({Icon, subtitle, context}) => (
+  <VStack
+    padding="10px"
+    position="relative"
+    w="30rem"
+    h="auto"
+    border="1px solid red"
+    spacing={5}
+    align="stretch"
+  >
+    {Icon}
+    <Text
+      textAlign="left"
+      position="relative"
+      fontSize="large"
+    >
+      {subtitle}  
+    </Text>
+    <Text
+      textAlign="left"
+      position='relative'
+      w="100%"
+    >
+      {context}
+    </Text>
+  </VStack>
+);
 
 const DividedBox = ({leftContent, rightContent}) => {
   return (
@@ -76,7 +105,6 @@ const Main = () => {
       w={"100vw"}
       h={"100vh"}
     >
-      <NavBar />
       <VStack
         position="relative"
         w="100vw" h="auto"
@@ -146,6 +174,23 @@ const Main = () => {
           />
         }
       />
+      <SimpleGrid 
+        column={2} spacing={10}
+        padding="2rem"
+      >
+        <IconTextBox 
+          Icon={
+            <EmailIcon/>
+          }
+          subtitle="이메일로도 간단히 볼 수 있게!"
+          context={"가입하지 않은 상대면 이메일로 간단히 보낼 수 있어요!"}
+        />
+        <IconTextBox 
+          Icon={<PhoneIcon/>}
+          subtitle="친구 추가"
+          context={"친구 추가 기능을 통해 친구를 추가해보세요! 서로서로 교환하는 편지는 친구창을 통해 볼 수 있습니다!"}
+        />
+      </SimpleGrid>
     </Box>
   );
 };
