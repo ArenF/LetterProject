@@ -7,7 +7,10 @@ import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 const Login = () => {
     const auth = getAuth();
     let navigate = useNavigate();
-    const [loginCheck, setLoginCheck] = useState(false);
+    
+    // 로그인 실패 체크
+    const [loginFailed, setLoginFailed] = useState(false);
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -21,21 +24,32 @@ const Login = () => {
     function emailCheck(value) {
         const email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
         setCorrect(email_regex.test(value));
-        console.log(email_regex.test(value));
     }
 
     // 로그인 버튼을 눌렀을 때
     function submitLogin() {
+        
+        // 이메일 정규식이 제대로 입력되지 않았을 때
+        if (!correct) {
+            setLoginFailed(true);
+            return;
+        }
+
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
+                setLoginFailed(false);
                 const user = userCredential.user;
-
                 console.log(user);
+                navigate('/');
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-            })
+
+                console.log(errorCode);
+                console.log(errorMessage);
+                setLoginFailed(true);
+            });
     }
 
     return (
@@ -62,19 +76,32 @@ const Login = () => {
                     >
                         <VStack
                             align='stretch'
-                            spacing={20}
+                            spacing={loginFailed ? 19.5 : 20}
                             w="20em"
                             paddingY={"2rem"}
                         >
                             <Heading size={"3xl"} textAlign='center' >로그인</Heading>
                             <VStack spacing={5}>
+                                {
+                                    loginFailed ?
+                                    <Text
+                                        paddingX='60px'
+                                        size={'md'}
+                                        textAlign='center'
+
+                                    >로그인에 실패하였습니다. 다시 시도 해주십시오.</Text>
+                                    : ''
+                                }
                                 <InputGroup size="md">
                                     <Input 
                                         pr='4.5rem'
                                         size="md"
                                         variant="outline"
                                         placeholder="Enter email"
+                                        isInvalid={loginFailed}
+                                        errorBorderColor="crimson"
                                         onChange={(event) => { 
+                                            if (loginFailed) setLoginFailed(false);
                                             setEmail(event.target.value);
                                             emailCheck(event.target.value);
                                          }}
@@ -88,7 +115,10 @@ const Login = () => {
                                         pr='4.5rem' 
                                         type={show ? 'text' : 'password'}
                                         placeholder="Enter password"
+                                        isInvalid={loginFailed}
+                                        errorBorderColor="crimson"
                                         onChange={(event) => {
+                                            if (loginFailed) setLoginFailed(false);
                                             setPassword(event.target.value);
                                         }}
                                     />
@@ -99,7 +129,7 @@ const Login = () => {
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
-                                <ChakraLink w='100%' href="/signup">
+                                <ChakraLink as={RouterLink} w='100%' to="/signup">
                                     <Text color='red' w='100%' textAlign='right' fontSize='xs'>
                                         비밀번호를 잊으셨나요?
                                     </Text>
