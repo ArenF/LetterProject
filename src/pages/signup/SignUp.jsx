@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input, InputGroup, InputRightElement, Box, Card, CardBody, Image, VStack, Heading, Button } from "@chakra-ui/react";
 import { Stepper, Step, StepTitle, StepDescription, StepSeparator, StepIndicator, StepStatus, StepIcon, StepNumber, useSteps } from "@chakra-ui/react";
-import { SlideFade, Collapse, Fade, useDisclosure } from "@chakra-ui/react";
+import { Hide, Avatar } from "@chakra-ui/react";
+import Dropzone from "../../components/DnD/Dropzone";
 
 
 const Page = ({ pages, count }) => {
     return (
-        <Box w='full' paddingX="5rem" margin={10}>
+        <Box w='full' minH="12em" paddingX="5rem" margin={10}>
             {pages[count]}
         </Box>
     );
@@ -15,7 +16,7 @@ const Page = ({ pages, count }) => {
 const steps = [
     { title: '회원 가입', description: '이메일&패스워드'},
     { title: '프로필', description: '이미지 & 이름'},
-    { title: 'Third', description: 'Select Rooms'}
+    { title: '끝', description: '로그인 하러 가기'}
 ];
 
 const SignUp = () => {
@@ -28,6 +29,27 @@ const SignUp = () => {
     const [show, setShow] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    // 프로필 이미지를 가져오고 불러올 수 있도록 함
+    // 파일과 해당 파일 이미지의 프리뷰를 모두 저장한다.
+    const [profileFile, setProfileFile] = useState(null);
+    const [profilePreview, setProfilePreview] = useState('');
+
+    //파일 데이터를 가질 input 컴포넌트의 ref 값
+    const fileInput = useRef(null);
+    const avatarRef = useRef(null);
+
+    // 파일 창을 띄워서 파일을 직접 넣을 수 있도록 함
+    function showFileSelect() {
+        fileInput.current.click();
+    }
+
+    useEffect(() => {
+        if (profileFile !== null) {
+            const imagePreview = URL.createObjectURL(profileFile);
+            setProfilePreview(imagePreview);
+        }
+    }, [profileFile]);
 
     return (
         <Box
@@ -89,7 +111,7 @@ const SignUp = () => {
                                             {/* 이메일 입력필드 */}
                                             <Input
                                                 size="md" 
-                                                placeholder="EMAIL"
+                                                placeholder="Enter email"
                                                 onChange={(event) => setEmail(event.target.value)}
                                                 value={email}
                                             />
@@ -118,8 +140,49 @@ const SignUp = () => {
                                     ),
                                     (
                                         <VStack spacing={10}>
-                                            
+                                            <Dropzone>
+                                                <input 
+                                                    type="file"
+                                                    ref={fileInput} 
+                                                    onChange={(event) => {
+                                                        const file = event.target.files[0];
+                                                        setProfileFile(
+                                                            file === undefined ? null : file
+                                                        );
+                                                    }}
+                                                    style={{display: "none"}}
+                                                />
+                                                <Avatar 
+                                                    src={profilePreview}
+                                                    ref={avatarRef}
+                                                    _hover={{
+                                                        bg:"teal.700",
+                                                        transition:"all 0.5s ease-in-out"
+                                                    }} 
+                                                    size="2xl" 
+                                                    bg={profilePreview === '' ? "teal.500" : "gray.50"}
+                                                    onClick={(event) => showFileSelect()}
+                                                />
+                                            </Dropzone>
+
+                                            <Input placeholder="이름" />
                                         </VStack>
+                                    ),
+                                    (
+                                        <Box
+                                            w="full"
+                                            h="full"
+                                            border='1px solid red'
+                                            align="center"
+                                            alignItems='center'
+                                        >
+                                            <Button
+                                            
+                                                colorScheme="purple"
+                                            >
+                                                로그인 하러 가기
+                                            </Button>
+                                        </Box>
                                     )
                                 ]}
                                 count={activeStep}

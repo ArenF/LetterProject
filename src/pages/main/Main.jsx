@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text, VStack, HStack, Heading, Button, UnorderedList, ListItem, Image, SimpleGrid } from "@chakra-ui/react";
+import { Box, Text, VStack, HStack, Heading, Button, UnorderedList, ListItem, Image, SimpleGrid, ListProps } from "@chakra-ui/react";
 import { EmailIcon, PhoneIcon } from "@chakra-ui/icons";
 
 const IconTextBox = ({Icon, subtitle, context}) => (
