@@ -1,5 +1,6 @@
-import { Box, Text, HStack, Link as ChakraLink, Image } from "@chakra-ui/react";
-import React from "react";
+import { Box, Text, HStack, Link as ChakraLink, Image, Avatar } from "@chakra-ui/react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import React, { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 const NavLinker = ({to, text}) => {
@@ -18,18 +19,21 @@ const NavLinker = ({to, text}) => {
 const ProfileBox = ({ image, name }) => {
     return (
         <HStack>
-            <ChakraLink as={RouterLink} to="/">{name}</ChakraLink>
-            <Image 
-                borderRadius='full'
-                boxSize='50px'
-                src= {image == null ? 'https://bit.ly/dan-abramov' : image}
-                alt='Dan Abramov'
+            <ChakraLink as={RouterLink} to="/">{name === null ? 'User' : name}</ChakraLink>
+            <Avatar 
+                src={image}
+                name={name}
             />
         </HStack>
     )
 }
 
 const NavBar = () => {
+    const [photoUrl, setPhotoUrl] = useState('');
+    const [displayName, setDisplayName] = useState('');
+
+    const auth = getAuth();
+
     return (
         <Box
             zIndex="1"
@@ -65,10 +69,13 @@ const NavBar = () => {
                     <NavLinker to="/mail" text="MAIL" />
                     <NavLinker to="/send" text="SEND" />
                     <NavLinker to="/template" text="TEMPLATE" />
-                    <NavLinker to="/login" text="LOGIN" />
+                    <NavLinker to="/login" text="LOGIN" />  
 
                     {/* 프로필 박스 */}
-                    <ProfileBox name="Dan Albert" />
+                    <ProfileBox
+                        image={photoUrl}
+                        name={displayName}
+                    />
                 </HStack>
             </HStack>
         </Box>

@@ -70,11 +70,7 @@ const Login = () => {
                 direction={{base: 'column', sm:'row'}}
             >
                 <CardBody>
-                    <HStack
-                        direction='row'
-                        spacing={0}
-                    >
-                        <VStack
+                <VStack
                             align='stretch'
                             spacing={loginFailed ? 19.5 : 20}
                             w="20em"
@@ -138,7 +134,6 @@ const Login = () => {
 
                             <Button colorScheme="purple" onClick={() => { submitLogin(); }}>로그인</Button>
                         </VStack>
-                    </HStack>
                 </CardBody>
 
                 <Image
