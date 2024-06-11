@@ -29,7 +29,10 @@ const ProfileBox = ({ image, name }) => {
 }
 
 const NavBar = () => {
-    // photoUrl 값은 firebase storage 값을 통해 가져온다.
+    // TODO photoUrl 값은 firebase storage 값을 통해 가져온다.
+    // Profile 페이지를 만들어 ProfileBox의 NAME을 통해 이동하게끔 한다.
+    // Profile 페이지에서는 firebase의 cloud firestore의 기능을 이용해
+    // 친구 요청, 친구, 편지들을 가져오는 기능을 만들 것 
     const [photoUrl, setPhotoUrl] = useState('');
     const [displayName, setDisplayName] = useState('');
 
