@@ -29,19 +29,20 @@ const ProfileBox = ({ image, name }) => {
 }
 
 const NavBar = () => {
+    // photoUrl 값은 firebase storage 값을 통해 가져온다.
     const [photoUrl, setPhotoUrl] = useState('');
     const [displayName, setDisplayName] = useState('');
 
     const auth = getAuth();
-    const user = auth.currentUser;
-    
-    useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
         if (user) {
+
+            console.log(user.photoURL);
+            console.log(user.displayName);
             setPhotoUrl(user.photoURL);
             setDisplayName(user.displayName);
-            console.log('로그인된 유저 데이터 실행');
         } else {
-            console.log('로그인 안된 유저 데이터 실행');
+
         }
     });
 
