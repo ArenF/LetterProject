@@ -1,17 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Input, InputGroup, InputRightElement, Box, Card, CardBody, Image, VStack, Heading, Button } from "@chakra-ui/react";
+import { Input, InputGroup, InputRightElement, Box, Card, CardBody, Image, VStack, Heading, Button, FormErrorMessage } from "@chakra-ui/react";
 import { Stepper, Step, StepTitle, StepDescription, StepSeparator, StepIndicator, StepStatus, StepIcon, StepNumber, useSteps } from "@chakra-ui/react";
-import { Hide, Avatar } from "@chakra-ui/react";
+import { FormControl, Avatar } from "@chakra-ui/react";
 import Dropzone from "../../components/DnD/Dropzone";
-
+import EmailFormLabel from "../../components/Form/EmailFormLabel";
+import PasswordFormLabel from "../../components/Form/PasswordFormLabel";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const Page = ({ pages, count }) => {
     return (
-        <Box w='full' minH="12em" paddingX="5rem" margin={10}>
+        <Box w='auto' minH="12em" paddingX="1em" margin={10}>
             {pages[count]}
         </Box>
     );
 };
+
+const NextButton = ({step, nextStep}) => (
+    <Button 
+        marginTop={"25px"}
+        colorScheme="blue"
+        size="lg"
+        onClick={() => nextStep(step+1)}
+    >다음</Button>
+);
 
 const steps = [
     { title: '회원 가입', description: '이메일&패스워드'},
@@ -21,19 +32,30 @@ const steps = [
 
 const SignUp = () => {
 
+    const auth = getAuth();
+
     const { activeStep, setActiveStep } = useSteps({
         index: 0,
         count: steps.length
     });
 
-    const [show, setShow] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
 
     // 프로필 이미지를 가져오고 불러올 수 있도록 함
     // 파일과 해당 파일 이미지의 프리뷰를 모두 저장한다.
+    /* 
+        **주의** 
+        profilePreview는 함부로 사용하지 않는다. 
+        useEffect에서 처리하고 있기 때문
+    */
     const [profileFile, setProfileFile] = useState(null);
     const [profilePreview, setProfilePreview] = useState('');
+
+    // 이후 모든 값들을 비교해 해당 값들을 정리한다.
+    const [submitError, setSubmitError] = useState(false);
+    const [submitErrorMessage, setSubmitErrorMessage] = useState('');
 
     //파일 데이터를 가질 input 컴포넌트의 ref 값
     const fileInput = useRef(null);
@@ -44,6 +66,7 @@ const SignUp = () => {
         fileInput.current.click();
     }
 
+    // 프로필파일이 업데이트가 되면 자동으로 preview로 변환해서 저장함
     useEffect(() => {
         if (profileFile !== null) {
             const imagePreview = URL.createObjectURL(profileFile);
@@ -75,7 +98,6 @@ const SignUp = () => {
                         align="stretch"
                         spacing={20}
                         paddingY={"2rem"}
-
                     >
                         <Heading size="3xl" textAlign="center">회원가입</Heading>
                         <VStack spacing={5}>
@@ -104,90 +126,135 @@ const SignUp = () => {
                                 ))}
                             </Stepper>
 
-                            <Page 
-                                pages={[
-                                    (
-                                        <VStack spacing={8}>
-                                            {/* 이메일 입력필드 */}
-                                            <Input
-                                                size="md" 
-                                                placeholder="Enter email"
-                                                onChange={(event) => setEmail(event.target.value)}
-                                                value={email}
-                                            />
-                                            {/* 비밀번호 입력필드 */}
-                                            <InputGroup size="md">
-                                                <Input 
-                                                    pr='4.5rem' 
-                                                    type={show ? 'text' : 'password'}
-                                                    placeholder="Enter password"
-                                                    onChange={(event) => setPassword(event.target.value)}
-                                                    value={password}
+                            <Box w='full' h='full'>
+                                <Page 
+                                    pages={[
+                                        (
+                                            <VStack spacing={8}>
+                                                {/* 이메일 입력필드 */}
+                                                <EmailFormLabel 
+                                                    size="md"
+                                                    placeholder="이메일을 입력하세요."
+                                                    emailChange={setEmail}
+                                                    email={email}
                                                 />
 
-                                                <InputRightElement width='4.5rem'>
-                                                    <Button h='1.75rem' size='sm' onClick={() => {setShow(!show)}}>
-                                                        {show ? 'Hide' : 'Show'}
-                                                    </Button>
-                                                </InputRightElement>
-                                            </InputGroup>
-                                            <Button 
-                                                colorScheme="blue"
-                                                size="lg"
-                                                onClick={() => setActiveStep(activeStep+1)}
-                                            >다음</Button>
-                                        </VStack>
-                                    ),
-                                    (
-                                        <VStack spacing={10}>
-                                            <Dropzone>
-                                                <input 
-                                                    type="file"
-                                                    ref={fileInput} 
-                                                    onChange={(event) => {
-                                                        const file = event.target.files[0];
-                                                        setProfileFile(
-                                                            file === undefined ? null : file
-                                                        );
+                                                {/* 비밀번호 입력필드 */}
+                                                <PasswordFormLabel 
+                                                    size="md"
+                                                    placeholder="패스워드를 입력하세요."
+                                                    passwordChange={setPassword}
+                                                    password={password}
+                                                />
+
+                                                <NextButton 
+                                                    step={activeStep}
+                                                    nextStep={setActiveStep}
+                                                />
+                                            </VStack>
+                                        ),
+                                        (
+                                            <VStack spacing={10}>
+                                                <Dropzone
+                                                    onDrop={(file) => {
+                                                        setProfileFile(file);
                                                     }}
-                                                    style={{display: "none"}}
+                                                >
+                                                    <input 
+                                                        type="file"
+                                                        ref={fileInput} 
+                                                        onChange={(event) => {
+                                                            const file = event.target.files[0];
+                                                            setProfileFile(
+                                                                file === undefined ? null : file
+                                                            );
+                                                        }}
+                                                        style={{display: "none"}}
+                                                    />
+                                                    <Avatar 
+                                                        src={profilePreview}
+                                                        ref={avatarRef}
+                                                        size="2xl" 
+                                                        _hover={{
+                                                            transition:"all 0.5s ease-in-out",
+                                                            bg:"blackAlpha.700"
+                                                        }}
+                                                        bg="teal.500"
+                                                        onClick={(event) => showFileSelect()}
+                                                    />
+                                                </Dropzone>
+                                                    
+                                                <Input
+                                                    placeholder="이름을 입력해주세요."
+                                                    value={name}
+                                                    onChange={(event) => setName(event.target.value)}
                                                 />
-                                                <Avatar 
-                                                    src={profilePreview}
-                                                    ref={avatarRef}
-                                                    _hover={{
-                                                        bg:"teal.700",
-                                                        transition:"all 0.5s ease-in-out"
-                                                    }} 
-                                                    size="2xl" 
-                                                    bg={profilePreview === '' ? "teal.500" : "gray.50"}
-                                                    onClick={(event) => showFileSelect()}
+    
+                                                <NextButton 
+                                                    step={activeStep}
+                                                    nextStep={setActiveStep}
                                                 />
-                                            </Dropzone>
-
-                                            <Input placeholder="이름" />
-                                        </VStack>
-                                    ),
-                                    (
-                                        <Box
-                                            w="full"
-                                            h="full"
-                                            border='1px solid red'
-                                            align="center"
-                                            alignItems='center'
-                                        >
-                                            <Button
-                                            
-                                                colorScheme="purple"
+                                            </VStack>
+                                        ),
+                                        (
+                                            <Box
+                                                w="full"
+                                                h="full"
+                                                border='1px solid red'
+                                                align="center"
+                                                alignItems='center'
                                             >
-                                                로그인 하러 가기
-                                            </Button>
-                                        </Box>
-                                    )
-                                ]}
-                                count={activeStep}
-                            />
+                                                <FormControl isInvalid={submitError}>
 
+                                                    {
+                                                        submitError ? (
+                                                            <FormErrorMessage
+                                                                textAlign={"center"}
+                                                            >
+                                                                {submitErrorMessage}
+                                                            </FormErrorMessage>
+                                                        ) : (
+                                                            <></>
+                                                        )
+                                                    }
+                                                    <Button
+                                                        onClick={(event) => {
+                                                            createUserWithEmailAndPassword(auth, email, password)
+                                                                .then((userCredential) => {
+                                                                    const user = userCredential.user;
+
+                                                                    updateProfile(user, {
+                                                                        displayName: name,
+                                                                        photoURL: profilePreview
+                                                                    });
+                                                                })
+                                                                .catch((error) => {
+                                                                    const code = error.code;
+                                                                    const message = error.message;
+                                                                    console.log(code);
+                                                                    console.log(message);
+                                                                    setSubmitError(true);
+                                                                    switch (code) {
+                                                                        case "auth/email-already-in-use":
+                                                                            setSubmitErrorMessage("이미 이메일이 존재합니다.");
+                                                                            break;
+                                                                        default:
+                                                                            setSubmitErrorMessage("회원가입 중에 오류가 발생하였습니다.");
+                                                                    }
+                                                                })
+                                                        }}
+                                                        colorScheme="purple"
+                                                    >
+                                                        회원가입 하기
+                                                    </Button>
+                                                </FormControl>
+                                                
+                                            </Box>
+                                        )
+                                    ]}
+                                    count={activeStep}
+                                />
+                            </Box>
                         </VStack>
                     </VStack>
                 </CardBody>

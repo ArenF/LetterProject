@@ -33,6 +33,17 @@ const NavBar = () => {
     const [displayName, setDisplayName] = useState('');
 
     const auth = getAuth();
+    const user = auth.currentUser;
+    
+    useEffect(() => {
+        if (user) {
+            setPhotoUrl(user.photoURL);
+            setDisplayName(user.displayName);
+            console.log('로그인된 유저 데이터 실행');
+        } else {
+            console.log('로그인 안된 유저 데이터 실행');
+        }
+    });
 
     return (
         <Box
