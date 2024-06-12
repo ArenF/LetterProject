@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
+import LoaderModal from "../loader/LoaderModal";
 
 const NavLinker = ({to, text}) => {
     return (
@@ -21,7 +22,10 @@ const ProfileBox = ({ image, name }) => {
 
     return (
         <HStack>
-            <ChakraLink as={RouterLink} to="/">{name === null ? 'User' : name}</ChakraLink>
+            <ChakraLink 
+                as={RouterLink} 
+                to={name === null ? "/signup" : "/profile" }
+            >{name === null ? 'Sign Up' : name}</ChakraLink>
             <Avatar 
                 src={image}
                 name={name}
@@ -31,19 +35,34 @@ const ProfileBox = ({ image, name }) => {
 }
 
 const NavBar = () => {
-    // TODO photoUrl 값은 firebase storage 값을 통해 가져온다.
-    // Profile 페이지를 만들어 ProfileBox의 NAME을 통해 이동하게끔 한다.
-    // Profile 페이지에서는 firebase의 cloud firestore의 기능을 이용해
-    // 친구 요청, 친구, 편지들을 가져오는 기능을 만들 것 
+    // auth에서 가져올 이미지와 이름
     const [photoUrl, setPhotoUrl] = useState('');
     const [displayName, setDisplayName] = useState('');
 
-    // 스토리지를 통한 이미지 불러오기
+    // 로딩할 때 사용할 로더
+    const [showLoader, setShowLoader] = useState(true);
 
+    // 이미지가 아직 불러오기 전이며 auth에 가입이 되어있다면
+    // displayName은 auth에서 값을 바로 가져오지만
+    // image URL은 불러오는데 용량이 있는 편
+    // 그렇기에 조건은 로그인 상태이면서 이미지가 없는 상태
+    // 실행은 로더 이미지를 띄우는 것이다.
+
+    useEffect(() => {
+        if (photoUrl === '' && displayName !== '') {
+            setShowLoader(true);
+        }
+        if (showLoader && photoUrl !== '') {
+            setInterval(() => setShowLoader(false), 400);
+        }
+    }, [photoUrl]);
+
+    // 스토리지를 통한 이미지 불러오기
     const storage = getStorage();
     const storageRef = ref(storage);
     const profileRef = ref(storageRef, '/profile');
 
+    // auth 기능을 통해 이미 로그인된 유저의 데이터를 가져옴
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -57,15 +76,6 @@ const NavBar = () => {
                 });
             
             setDisplayName(user.displayName);
-
-            console.log({
-                name: displayName,
-                photo: photoUrl
-            });
-
-        } else {
-            setDisplayName('Sign Out');
-            setPhotoUrl('');
         }
     });
 
@@ -113,6 +123,9 @@ const NavBar = () => {
                     />
                 </HStack>
             </HStack>
+            <LoaderModal  
+                openCondition={showLoader}
+            />
         </Box>
     );
 };
