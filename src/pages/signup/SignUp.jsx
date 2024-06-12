@@ -6,6 +6,8 @@ import Dropzone from "../../components/DnD/Dropzone";
 import EmailFormLabel from "../../components/Form/EmailFormLabel";
 import PasswordFormLabel from "../../components/Form/PasswordFormLabel";
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
 
 const Page = ({ pages, count }) => {
     return (
@@ -33,6 +35,10 @@ const steps = [
 const SignUp = () => {
 
     const auth = getAuth();
+    const storage = getStorage();
+    const storageRef = ref(storage);
+    const profileRef = ref(storageRef, 'profile');
+    const navigate = useNavigate();
 
     const { activeStep, setActiveStep } = useSteps({
         index: 0,
@@ -64,6 +70,14 @@ const SignUp = () => {
     // 파일 창을 띄워서 파일을 직접 넣을 수 있도록 함
     function showFileSelect() {
         fileInput.current.click();
+    }
+
+    function uploadImageFile({filename, file}) {
+        const imageRef = ref(profileRef, filename);
+
+        uploadBytes(imageRef, file).then((snapshot) => {
+            console.log('Uploaded a blob or file!');
+        })
     }
 
     // 프로필파일이 업데이트가 되면 자동으로 preview로 변환해서 저장함
@@ -225,8 +239,14 @@ const SignUp = () => {
 
                                                                     updateProfile(user, {
                                                                         displayName: name,
-                                                                        photoURL: profilePreview
+                                                                        photoURL: ''
                                                                     });
+
+                                                                    uploadImageFile({
+                                                                        filename: user.uid,
+                                                                        file: profileFile
+                                                                    });
+                                                                    navigate('/');
                                                                 })
                                                                 .catch((error) => {
                                                                     const code = error.code;
