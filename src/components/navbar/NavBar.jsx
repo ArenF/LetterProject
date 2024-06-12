@@ -1,5 +1,6 @@
 import { Box, Text, HStack, Link as ChakraLink, Image, Avatar } from "@chakra-ui/react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
@@ -17,6 +18,7 @@ const NavLinker = ({to, text}) => {
 };
 
 const ProfileBox = ({ image, name }) => {
+
     return (
         <HStack>
             <ChakraLink as={RouterLink} to="/">{name === null ? 'User' : name}</ChakraLink>
@@ -36,16 +38,34 @@ const NavBar = () => {
     const [photoUrl, setPhotoUrl] = useState('');
     const [displayName, setDisplayName] = useState('');
 
+    // 스토리지를 통한 이미지 불러오기
+
+    const storage = getStorage();
+    const storageRef = ref(storage);
+    const profileRef = ref(storageRef, '/profile');
+
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            const uidRef = ref(profileRef, '/' + user.uid);
+            getDownloadURL(uidRef)
+                .then((url) => {
+                    setPhotoUrl(url);
+                })
+                .catch((error) => {
 
-            console.log(user.photoURL);
-            console.log(user.displayName);
-            setPhotoUrl(user.photoURL);
+                });
+            
             setDisplayName(user.displayName);
-        } else {
 
+            console.log({
+                name: displayName,
+                photo: photoUrl
+            });
+
+        } else {
+            setDisplayName('Sign Out');
+            setPhotoUrl('');
         }
     });
 

@@ -73,6 +73,7 @@ const SignUp = () => {
     }
 
     function uploadImageFile({filename, file}) {
+        
         const imageRef = ref(profileRef, filename);
 
         uploadBytes(imageRef, file).then((snapshot) => {
@@ -232,20 +233,23 @@ const SignUp = () => {
                                                         )
                                                     }
                                                     <Button
-                                                        onClick={(event) => {
+                                                        onClick={async (event) => {
                                                             createUserWithEmailAndPassword(auth, email, password)
                                                                 .then((userCredential) => {
                                                                     const user = userCredential.user;
+
+                                                                    // 프로필 이미지 업로드와 프로필 데이터 변경은 따로 진행
+                                                                    // 포토 URL을 storage에서 한번 불러올 때 업데이트 하는 것으로 변경
+                                                                    uploadImageFile({
+                                                                        filename: user.uid,
+                                                                        file: profileFile
+                                                                    });
 
                                                                     updateProfile(user, {
                                                                         displayName: name,
                                                                         photoURL: ''
                                                                     });
 
-                                                                    uploadImageFile({
-                                                                        filename: user.uid,
-                                                                        file: profileFile
-                                                                    });
                                                                     navigate('/');
                                                                 })
                                                                 .catch((error) => {
