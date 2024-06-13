@@ -53,6 +53,7 @@ const NavBar = () => {
             setShowLoader(true);
         }
         if (showLoader && photoUrl !== '') {
+            // 이미지 로딩 후 딜레이
             setInterval(() => setShowLoader(false), 400);
         }
     }, [photoUrl]);
@@ -67,15 +68,21 @@ const NavBar = () => {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             const uidRef = ref(profileRef, '/' + user.uid);
-            getDownloadURL(uidRef)
+            if (user.photoURL === null || user.photoURL === '') {
+                getDownloadURL(uidRef)
                 .then((url) => {
-                    setPhotoUrl(url);
+                    updateProfile(user, {
+                        displayName: user.displayName,
+                        photoURL: url
+                    });
                 })
                 .catch((error) => {
 
                 });
+            }
             
             setDisplayName(user.displayName);
+            setPhotoUrl(user.photoURL);
         }
     });
 

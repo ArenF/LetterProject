@@ -6,6 +6,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import theme from "./theme";
 import App from "./App";
 import { getStorage } from "firebase/storage";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_APP_KEY,
@@ -20,6 +21,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app);
+const db = getFirestore(app);
 
 const root = createRoot(document.getElementById('root'));
 root.render(
