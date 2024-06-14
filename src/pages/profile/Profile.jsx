@@ -36,28 +36,29 @@ const TabRow = ({rows, colorMode}) => {
 
 const LetterPage = (uid) => {
     const db = getFirestore();
-    const uidRef = doc(db, "profile", uid);
+    // doc 함수에 오류가 있어서 잠시 주석처리함
+    // const uidRef = doc(db, "profile", uid);
 
-    useEffect(() => {
-        getDoc(uidRef)
-            .then((snapshot) => {
-                if (!snapshot.exists()) {
-                    // 비동기 함수이기에 작동한다고 바로 값이 나오지 않음
-                    setDoc(uidRef, {
-                        friendsPoint:{
-                            "":0,
-                            "":0,
-                        },
-                        level:1
-                    });
+    // useEffect(() => {
+    //     getDoc(uidRef)
+    //         .then((snapshot) => {
+    //             if (!snapshot.exists()) {
+    //                 // 비동기 함수이기에 작동한다고 바로 값이 나오지 않음
+    //                 setDoc(uidRef, {
+    //                     friendsPoint:{
+    //                         "":0,
+    //                         "":0,
+    //                     },
+    //                     level:1
+    //                 });
 
 
-                }
-            })
-            .catch((error) => {
+    //             }
+    //         })
+    //         .catch((error) => {
 
-            });
-    }, [uidRef]);
+    //         });
+    // }, [uidRef]);
 
     return (
         <VStack>
@@ -71,12 +72,15 @@ const Profile = () => {
     const userRef = useRef();
 
     const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            setPhotoUrl(user.photoURL);
-            userRef.current = user;
-        }
-    });
+    
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setPhotoUrl(user.photoURL);
+                userRef.current = user;
+            }
+        });
+    }, []);
     
     return (
         <Box

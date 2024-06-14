@@ -65,26 +65,29 @@ const NavBar = () => {
 
     // auth 기능을 통해 이미 로그인된 유저의 데이터를 가져옴
     const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const uidRef = ref(profileRef, '/' + user.uid);
-            if (user.photoURL === null || user.photoURL === '') {
-                getDownloadURL(uidRef)
-                .then((url) => {
-                    updateProfile(user, {
-                        displayName: user.displayName,
-                        photoURL: url
+    
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const uidRef = ref(profileRef, '/' + user.uid);
+                if (user.photoURL === null || user.photoURL === '') {
+                    getDownloadURL(uidRef)
+                    .then((url) => {
+                        updateProfile(user, {
+                            displayName: user.displayName,
+                            photoURL: url
+                        });
+                    })
+                    .catch((error) => {
+    
                     });
-                })
-                .catch((error) => {
-
-                });
+                }
+                
+                setDisplayName(user.displayName == null ? '' : user.displayName);
+                setPhotoUrl(user.photoURL == null ? '' : user.photoURL);
             }
-            
-            setDisplayName(user.displayName);
-            setPhotoUrl(user.photoURL);
-        }
-    });
+        });
+    }, []);
 
     return (
         <Box
