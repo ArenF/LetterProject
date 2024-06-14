@@ -124,7 +124,13 @@ const NavBar = () => {
                     <NavLinker to="/mail" text="MAIL" />
                     <NavLinker to="/send" text="SEND" />
                     <NavLinker to="/template" text="TEMPLATE" />
-                    <NavLinker to="/login" text="LOGIN" />  
+                    {
+                        auth.currentUser === null ? (
+                            <NavLinker to="/login" text="LOGIN" />
+                        ) : (
+                            <NavLinker to="/logout" text="LOGOUT" />
+                        )
+                    }
 
                     {/* 프로필 박스 */}
                     <ProfileBox

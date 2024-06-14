@@ -1,35 +1,60 @@
 import { ChevronDownIcon, HamburgerIcon, SunIcon } from "@chakra-ui/icons";
-import { Box, Stack, Card, Text, Input, Textarea, InputGroup, InputRightElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Editable, EditableInput, EditablePreview } from "@chakra-ui/react";
+import { Box, Stack, Card, Text, Input, Textarea, InputGroup, InputRightElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Editable, EditableInput, EditablePreview, useDisclosure, Collapse } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 const textAreaData = {
     min: 25,
     max: 40
 };
-const ItemNavigation = () => {
+
+const ClickableIcon = ({ label, icon, onClick}) => (
+    <IconButton
+        w="fit-content"
+        size="lg"
+        isRound={true}
+        variant="solid"
+        colorScheme="blue"
+        aria-label={label}
+        icon={icon}
+        onClick={onClick}
+    />
+);
+
+const IconNavigation = () => {
+    const { isOpen, onToggle } = useDisclosure();
 
     return (
         <Stack
-            direction="column"
+            position="relative"
             left={0}
             top={0}
-            width="42px"
-            height="auto"
-            border="1px solid red"
+            maxWidth="20em"
+            padding="8px"
+            direction="column"
         >
-            <IconButton 
-                width="auto"
-                aria-label="hamburger"
+            <ClickableIcon 
+                label="hamburger"
                 icon={<HamburgerIcon/>}
+                onClick={onToggle}
             />
-            <IconButton 
-                aria-label="pallete"
-                icon={<SunIcon/>}
-            />
-            <IconButton 
-                aria-label="sticker"
-                icon={<ChevronDownIcon/>}
-            />
+            <Collapse 
+                in={isOpen}
+            >
+                <Stack
+                    direction="column"
+                >
+                    <ClickableIcon 
+                        label={"pallete"}
+                        icon={<SunIcon/>}
+                        onClick={() => {}}
+                    />
+                    <ClickableIcon 
+                        label="sticker"
+                        icon={<ChevronDownIcon/>}
+                        onClick={() => {}}
+                    />
+                </Stack>
+            </Collapse>
         </Stack>
     );
 };
@@ -65,7 +90,7 @@ const SendPage = () => {
             bgGradient="linear(to-tr, blue.100, gray.50)"
             paddingTop="10em"
         >
-            <ItemNavigation />
+            <IconNavigation />
             <Card
                 position="absolute"
                 top="50%"
