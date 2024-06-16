@@ -1,13 +1,17 @@
 import { ChevronDownIcon, HamburgerIcon, SunIcon } from "@chakra-ui/icons";
-import { Box, Stack, Card, Text, Input, Textarea, InputGroup, InputRightElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Editable, EditableInput, EditablePreview, useDisclosure, Collapse } from "@chakra-ui/react";
+import { Box, Stack, Card, Text, Input, Textarea, InputGroup, InputRightElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Editable, EditableInput, EditablePreview, useDisclosure, Collapse, Show, Popover, PopoverTrigger, PopoverContent, Portal, PopoverArrow, PopoverBody, PopoverFooter, PopoverHeader, PopoverCloseButton, ButtonGroup, Button, FormControl, FormLabel, Select, Avatar } from "@chakra-ui/react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getStorage, ref } from "firebase/storage";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ChromePicker, SketchPicker } from "react-color";
+import { useNavigate } from "react-router-dom";
 
 const textAreaData = {
     min: 25,
     max: 40
 };
 
-const ClickableIcon = ({ label, icon, onClick}) => (
+const ClickableIcon = ({ label, icon, onClick }) => (
     <IconButton
         w="fit-content"
         size="lg"
@@ -20,7 +24,49 @@ const ClickableIcon = ({ label, icon, onClick}) => (
     />
 );
 
-const IconNavigation = () => {
+// changeTo 함수는 편지지 배경의 색상을 지정할 때 자동으로 적용되게 하는 함수
+// changeTo 함수의 parameter는 color(RGB) 형태로 표현됨 타입은 string
+const PopoverColorPicker = ({ changeTo, defaultColor }) => {
+    // Focus 상태일 때는 꺼지지 않게 하기 위한 변수
+    const initialFocusRef = useRef();
+    const [bgColor, setBgColor] = useState(defaultColor);
+
+    return (
+        <Popover
+            initialFocusRef={initialFocusRef}
+            placement='right'
+            closeOnBlur={false}
+        >
+            <PopoverTrigger>
+                <IconButton 
+                    w="fit-content"
+                    size="lg"
+                    isRound={true}
+                    variant="solid"
+                    colorScheme="blue"
+                    aria-label="pallete"
+                    icon={<SunIcon/>}
+                />
+            </PopoverTrigger>
+            <PopoverContent color='white' bg='blue.800' borderColor='blue.800' w="fit-content">
+                <PopoverArrow 
+                    bg="blue.800"
+                />
+                <PopoverBody w="auto">
+                    <SketchPicker 
+                        color={bgColor}
+                        onChangeComplete={(color, event) => {
+                            setBgColor(color.hex);
+                            changeTo(color.hex);
+                        }}
+                    />
+                </PopoverBody>
+            </PopoverContent>
+        </Popover>
+    )
+}
+
+const IconNavigation = ({ onPickColor, pickColor }) => {
     const { isOpen, onToggle } = useDisclosure();
 
     return (
@@ -43,15 +89,16 @@ const IconNavigation = () => {
                 <Stack
                     direction="column"
                 >
-                    <ClickableIcon 
-                        label={"pallete"}
-                        icon={<SunIcon/>}
-                        onClick={() => {}}
+                    <PopoverColorPicker 
+                        changeTo={(rgb) => {
+                            onPickColor(rgb);
+                            console.log(rgb);
+                        }}
+                        defaultColor={pickColor}
                     />
                     <ClickableIcon 
                         label="sticker"
                         icon={<ChevronDownIcon/>}
-                        onClick={() => {}}
                     />
                 </Stack>
             </Collapse>
@@ -62,26 +109,47 @@ const IconNavigation = () => {
 const SendPage = () => {
     // 텍스트를 가져와서 해당 값들을
     // height를 scrollHeight로 자동 수정하는 것
-    const textRef = useRef();
-    const handleResizeHeight = useCallback(() => {
+    
+    // const textRef = useRef();
+    // const handleResizeHeight = useCallback(() => {
 
-        if ((textAreaData.max * 16) > textRef.current.scrollHeight) {
-            // 기본 25em으로 초기화 
-            textRef.current.style.height = textAreaData.min + "em";
-            textRef.current.style.height = textRef.current.scrollHeight + "px";
-        } 
+    //     if ((textAreaData.max * 16) > textRef.current.scrollHeight) {
+    //         // 기본 25em으로 초기화 
+    //         textRef.current.style.height = textAreaData.min + "em";
+    //         textRef.current.style.height = textRef.current.scrollHeight + "px";
+    //     } 
+    // });
+
+    // // 마운트할 때 단 한번 실행
+    // useEffect(() => {
+    //     textRef.current.style.height = textAreaData.min + "em";
+    // }, []);
+
+    const navigate = useNavigate();
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user === null) {
+                navigate('/login');
+            }
+        });
     });
 
-    // 마운트할 때 단 한번 실행
     useEffect(() => {
-        textRef.current.style.height = textAreaData.min + "em";
+        const storage = getStorage();
+        const pathRef = ref(storage, '');
     }, []);
 
-    const [receiver, setReceiver] = useState('');
+    const [date, setDate] = useState(new Date().toLocaleString());
+    const [bgColor, setBgColor] = useState("#DCD6F7");
+    const [contexts, setContexts] = useState('');
+    const [title, setTitle] = useState('TITLE');
 
-    const [paperColor, setPaperColor] = useState('');
-    const [lineColor, setLineColor] = useState('');
-
+    const [receiverName, setReceiverName] = useState('');
+    const [senderName, setSenderName] = useState('');
 
     return (
         <Box
@@ -90,114 +158,67 @@ const SendPage = () => {
             bgGradient="linear(to-tr, blue.100, gray.50)"
             paddingTop="10em"
         >
-            <IconNavigation />
+            <IconNavigation
+                onPickColor={(color) => setBgColor(color)}
+                pickColor={bgColor}
+            />
             <Card
-                position="absolute"
-                top="50%"
+                bg="white"
+                align="center"
+                variant="elevated"
+                position={"absolute"}
                 left="50%"
+                top="50%"
                 transform="translate(-50%, -50%)"
-                align="stretch"
-                minW="50em" minH="40em"
-                /* Background lines */
-                backgroundImage="linear-gradient(#FFF8E3 1.5rem, #424874 1.8rem)"
-                backgroundSize="100% 1.6rem"
             >
                 <Stack
-                    direction={'column'}
-                    align="stretch"
-                    padding="25px"
-                    gap={4}
+                    padding="1em"
+                    background="transparent"
+                    backgroundImage={`linear-gradient(${bgColor} 1.2rem, #042F4B 1.4rem)`}
+                    backgroundSize="100% 1.3rem"
+                    lineHeight="1.2rem"
+                    fontSize="1.2rem"
+                    direction="column"
+                    spacing={4}
+                    minW="40em"
                 >
-                    <Editable 
+                    <Input
+                        value={title}
+                        onChange={(event) => setTitle(event.target.value)}
+                        variant="flushed"
+                        size="lg"
                         textAlign="center"
+                        background="transparent"
                         fontSize="32px"
                         fontWeight="bold"
-                        defaultValue="Title"
-                    >
-                        <EditablePreview />
-                        <EditableInput />
-                    </Editable>
-                    {/* row-reverse는 오른쪽에서 왼쪽으로 정렬해줌 */}
-                    <Stack direction="row-reverse">
+                    />
+
+                    <Stack direction="row-reverse" w="auto">
                         <Input 
-                            size="sm"
-                            width='auto'
-                            htmlSize={8}
-                            readOnly={true}
+                            w="fit-content"
+                            value={date}
+                            variant="flushed"
+                            size="sm"  
+                            readOnly
+                            textAlign="right"
                             color="gray.500"
-                            value={new Date().toLocaleDateString('ko-KR')}
                         />
                     </Stack>
-                    <Stack direction="row-reverse" align='baseline'>
-                        <Text>에게</Text>
-                        <InputGroup
-                            width="auto"
-                        >
-                            <Input 
-                                width="auto"
-                                htmlSize={6}
-                                size='md'
-                                overflow="hidden"
-                                placeholder="to who?"
-                                value={receiver}
-                                onChange={(event) => setReceiver(event.target.value)}
+                    <Stack direction="row" w='auto'>
+                        {/* 프리뷰 위치 */}
+                        <Stack direction="row">
+                            <Text></Text>
+                        </Stack>
+                        <Menu>
+                            <MenuButton
+                                as={IconButton} icon={<ChevronDownIcon/>}
                             />
-                            <InputRightElement>
-                                <Menu>
-                                    <MenuButton
-                                        size={'sm'}
-                                        as={IconButton} 
-                                        icon={<ChevronDownIcon/>}
-                                    />
-                                    <MenuList>
-                                        <MenuItem onClick={() => setReceiver("Friend1")}>Friend1</MenuItem>
-                                        <MenuItem onClick={() => setReceiver("Friend2")}>Friend2</MenuItem>
-                                    </MenuList>
-                                </Menu>
-                            </InputRightElement>
-                        </InputGroup>
-                    </Stack>
-                    <Textarea 
-                        resize="none"
-                        lineHeight={1.42}
-                        fontSize="1.1em"
-                        ref={textRef}
-                        onInput={handleResizeHeight}
-                        border="none"
-                        focusBorderColor="transparent"
-                        position="relative"
-                    />
-                    <Stack
-                        direction="row"
-                        align="baseline"
-                    >
-                        <InputGroup
-                            width="auto"
-                        >
-                            <Input 
-                                width="auto"
-                                htmlSize={6}
-                                size='md'
-                                overflow="hidden"
-                                placeholder="from who?"
-                                value={receiver}
-                                onChange={(event) => setReceiver(event.target.value)}
-                            />
-                            <InputRightElement>
-                                <Menu>
-                                    <MenuButton
-                                        size={'sm'}
-                                        as={IconButton} 
-                                        icon={<ChevronDownIcon/>}
-                                    />
-                                    <MenuList>
-                                        <MenuItem onClick={() => setReceiver("Friend1")}>Friend1</MenuItem>
-                                        <MenuItem onClick={() => setReceiver("Friend2")}>Friend2</MenuItem>
-                                    </MenuList>
-                                </Menu>
-                            </InputRightElement>
-                        </InputGroup>
-                        <Text>에게</Text>
+                            <MenuList>
+                                <MenuItem minH="40px">
+                                    
+                                </MenuItem>
+                            </MenuList>
+                        </Menu>
                     </Stack>
                 </Stack>
             </Card>

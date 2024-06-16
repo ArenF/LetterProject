@@ -35,6 +35,7 @@ const ProfileBox = ({ image, name }) => {
 }
 
 const NavBar = () => {
+
     // auth에서 가져올 이미지와 이름
     const [photoUrl, setPhotoUrl] = useState('');
     const [displayName, setDisplayName] = useState('');
@@ -42,12 +43,16 @@ const NavBar = () => {
     // 로딩할 때 사용할 로더
     const [showLoader, setShowLoader] = useState(true);
 
+    // 스토리지를 통한 이미지 불러오기
+    const storage = getStorage();
+    const storageRef = ref(storage);
+    const profileRef = ref(storageRef, '/profile');
+
     // 이미지가 아직 불러오기 전이며 auth에 가입이 되어있다면
     // displayName은 auth에서 값을 바로 가져오지만
     // image URL은 불러오는데 용량이 있는 편
     // 그렇기에 조건은 로그인 상태이면서 이미지가 없는 상태
     // 실행은 로더 이미지를 띄우는 것이다.
-
     useEffect(() => {
         if (photoUrl === '' && displayName !== '') {
             setShowLoader(true);
@@ -57,11 +62,6 @@ const NavBar = () => {
             setInterval(() => setShowLoader(false), 400);
         }
     }, [photoUrl]);
-
-    // 스토리지를 통한 이미지 불러오기
-    const storage = getStorage();
-    const storageRef = ref(storage);
-    const profileRef = ref(storageRef, '/profile');
 
     // auth 기능을 통해 이미 로그인된 유저의 데이터를 가져옴
     const auth = getAuth();
@@ -79,12 +79,14 @@ const NavBar = () => {
                         });
                     })
                     .catch((error) => {
-    
+                        
                     });
                 }
                 
                 setDisplayName(user.displayName == null ? '' : user.displayName);
                 setPhotoUrl(user.photoURL == null ? '' : user.photoURL);
+            } else {
+                setShowLoader(false);
             }
         });
     }, []);
