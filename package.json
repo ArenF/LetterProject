@@ -24,7 +24,8 @@
     "react-beautiful-dnd": "^13.1.1",
     "react-color": "^2.19.3",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.23.1"
+    "react-router-dom": "^6.23.1",
+    "redux": "^5.0.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.24.6",

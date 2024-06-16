@@ -24,6 +24,30 @@ const ClickableIcon = ({ label, icon, onClick }) => (
     />
 );
 
+const PopoverSticker = () => {
+    const initialFocusRef = useRef();
+    
+    return (
+        <Popover
+            initialFocusRef={initialFocusRef}
+            placement="right"
+            closeOnBlur={false}
+        >
+            <PopoverTrigger>
+                <Iconbutton 
+                    w="fit-content"
+                    size="lg"
+                    isRound={true}
+                    variant="solid"
+                    colorScheme="blue"
+                    aria-label="sticker"
+                    icon={<ChevronDownIcon/>}
+                />
+            </PopoverTrigger>
+        </Popover>
+    );
+};
+
 // changeTo 함수는 편지지 배경의 색상을 지정할 때 자동으로 적용되게 하는 함수
 // changeTo 함수의 parameter는 color(RGB) 형태로 표현됨 타입은 string
 const PopoverColorPicker = ({ changeTo, defaultColor }) => {
@@ -100,6 +124,7 @@ const IconNavigation = ({ onPickColor, pickColor }) => {
                         label="sticker"
                         icon={<ChevronDownIcon/>}
                     />
+                    Popover
                 </Stack>
             </Collapse>
         </Stack>
@@ -140,7 +165,8 @@ const SendPage = () => {
 
     useEffect(() => {
         const storage = getStorage();
-        const pathRef = ref(storage, '');
+        const pathRef = ref(storage, 'profile');
+        
     }, []);
 
     const [date, setDate] = useState(new Date().toLocaleString());
@@ -148,6 +174,8 @@ const SendPage = () => {
     const [contexts, setContexts] = useState('');
     const [title, setTitle] = useState('TITLE');
 
+    // 친구 시스템은 보류
+    // 일단은 어떻게 저장할 지부터 설정
     const [receiverName, setReceiverName] = useState('');
     const [senderName, setSenderName] = useState('');
 
