@@ -46,7 +46,7 @@ const PopoverSticker = ({ dispatch = () => {} }) => {
     const index = useRef(0);
     
     return (
-        <Box border="1px solid green">
+        <Box>
             <Popover
                 initialFocusRef={initialFocusRef}
                 placement="right"
@@ -200,7 +200,6 @@ const SendPage = () => {
     const navigate = useNavigate();
 
     const auth = getAuth();
-    const user = auth.currentUser;
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
@@ -302,7 +301,6 @@ const SendPage = () => {
             >
                 <Stack
                     padding="1em"
-                    background="transparent"
                     backgroundImage={`linear-gradient(${bgColor} 1.2rem, #042F4B 1.4rem)`}
                     backgroundSize="100% 1.3rem"
                     lineHeight="1.2rem"
@@ -311,6 +309,7 @@ const SendPage = () => {
                     spacing={4}
                     minW="40em"
                 >
+                    {/* 타이틀 */}
                     <Input
                         value={title}
                         onChange={(event) => setTitle(event.target.value)}
@@ -321,6 +320,7 @@ const SendPage = () => {
                         fontSize="32px"
                         fontWeight="bold"
                     />
+                    {/* Date */}
                     <Stack direction="row-reverse" w="auto">
                         <Input 
                             w="fit-content"
@@ -332,21 +332,25 @@ const SendPage = () => {
                             color="gray.500"
                         />
                     </Stack>
+                    {/*  */}
                     <Stack direction="row" w='auto'>
                         {/* 프리뷰 위치 */}
                         <Stack direction="row">
                             <Text></Text>
                         </Stack>
-                        <Menu>
-                            <MenuButton
-                                as={IconButton} icon={<ChevronDownIcon/>}
-                            />
-                            <MenuList>
-                                <MenuItem minH="40px">
-                                </MenuItem>
-                            </MenuList>
-                        </Menu>
+                        
                     </Stack>
+                    <Textarea 
+                        backgroundColor="transparent"
+                        placeholder="내용을 입력하세요"
+                        value={contexts}
+                        border="none"
+                        onChange={(event) => setContexts(event.target.value)}
+                        size='lg'
+                        minH={textAreaData.min + "em"} maxH={textAreaData.max + "em"}
+                        fontSize="1.2rem"
+                        resize="none"
+                    />
                 </Stack>
             </Card>
         </Box>
