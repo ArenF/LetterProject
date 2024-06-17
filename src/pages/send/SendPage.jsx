@@ -1,5 +1,5 @@
 import { ChevronDownIcon, HamburgerIcon, SunIcon } from "@chakra-ui/icons";
-import { Box, Stack, Card, Text, Input, Textarea, InputGroup, InputRightElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Editable, EditableInput, EditablePreview, useDisclosure, Collapse, Show, Popover, PopoverTrigger, PopoverContent, Portal, PopoverArrow, PopoverBody, PopoverFooter, PopoverHeader, PopoverCloseButton, ButtonGroup, Button, FormControl, FormLabel, Select, Avatar } from "@chakra-ui/react";
+import { Box, Stack, Card, Text, Input, Textarea, InputGroup, InputRightElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Editable, EditableInput, EditablePreview, useDisclosure, Collapse, Show, Popover, PopoverTrigger, PopoverContent, Portal, PopoverArrow, PopoverBody, PopoverFooter, PopoverHeader, PopoverCloseButton, ButtonGroup, Button, FormControl, FormLabel, Select, Avatar, SimpleGrid } from "@chakra-ui/react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getStorage, ref } from "firebase/storage";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -34,7 +34,7 @@ const PopoverSticker = () => {
             closeOnBlur={false}
         >
             <PopoverTrigger>
-                <Iconbutton 
+                <IconButton
                     w="fit-content"
                     size="lg"
                     isRound={true}
@@ -44,6 +44,17 @@ const PopoverSticker = () => {
                     icon={<ChevronDownIcon/>}
                 />
             </PopoverTrigger>
+            <PopoverContent color='white' bg='blue.800' borderColor='blue.800' w="fit-content">
+                <PopoverArrow />
+                <SimpleGrid columns={2} padding={6} spacing={6} >
+                    <Box bg="white" w="48px" h="48px"></Box>
+                    <Box bg="white" w="48px" h="48px"></Box>
+                    <Box bg="white" w="48px" h="48px"></Box>
+                    <Box bg="white" w="48px" h="48px"></Box>
+                    <Box bg="white" w="48px" h="48px"></Box>
+                    <Box bg="white" w="48px" h="48px"></Box>
+                </SimpleGrid>
+            </PopoverContent>
         </Popover>
     );
 };
@@ -120,11 +131,7 @@ const IconNavigation = ({ onPickColor, pickColor }) => {
                         }}
                         defaultColor={pickColor}
                     />
-                    <ClickableIcon 
-                        label="sticker"
-                        icon={<ChevronDownIcon/>}
-                    />
-                    Popover
+                    <PopoverSticker />
                 </Stack>
             </Collapse>
         </Stack>
@@ -161,12 +168,12 @@ const SendPage = () => {
                 navigate('/login');
             }
         });
-    });
+    }, []);
 
     useEffect(() => {
         const storage = getStorage();
         const pathRef = ref(storage, 'profile');
-        
+
     }, []);
 
     const [date, setDate] = useState(new Date().toLocaleString());
