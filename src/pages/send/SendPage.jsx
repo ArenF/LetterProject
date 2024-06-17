@@ -1,10 +1,11 @@
 import { ChevronDownIcon, HamburgerIcon, SunIcon } from "@chakra-ui/icons";
-import { Box, Stack, Card, Text, Input, Textarea, InputGroup, InputRightElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Editable, EditableInput, EditablePreview, useDisclosure, Collapse, Show, Popover, PopoverTrigger, PopoverContent, Portal, PopoverArrow, PopoverBody, PopoverFooter, PopoverHeader, PopoverCloseButton, ButtonGroup, Button, FormControl, FormLabel, Select, Avatar, SimpleGrid } from "@chakra-ui/react";
+import { Box, Stack, Card, Text, Input, Textarea, InputGroup, InputRightElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Editable, EditableInput, EditablePreview, useDisclosure, Collapse, Show, Popover, PopoverTrigger, PopoverContent, Portal, PopoverArrow, PopoverBody, PopoverFooter, PopoverHeader, PopoverCloseButton, ButtonGroup, Button, FormControl, FormLabel, Select, Avatar, SimpleGrid, Image } from "@chakra-ui/react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getStorage, ref } from "firebase/storage";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { ChromePicker, SketchPicker } from "react-color";
 import { useNavigate } from "react-router-dom";
+import Sticker from "../../components/sticker/Sticker";
 
 const textAreaData = {
     min: 25,
@@ -24,38 +25,75 @@ const ClickableIcon = ({ label, icon, onClick }) => (
     />
 );
 
-const PopoverSticker = () => {
+const StickerButton = ({ onClick = (event) => {}, stickerSrc }) => {
+    return (
+        <Button 
+            colorScheme="blackAlpha" variant="ghost"
+            onClick={onClick}  
+        >
+            <Image 
+                src={stickerSrc}
+                w="50px" h="50px"
+            />
+        </Button>
+    );
+};
+
+const PopoverSticker = ({ dispatch = () => {} }) => {
     const initialFocusRef = useRef();
+
+    // ID 값 따로 정하기 위한 ref
+    const index = useRef(0);
     
     return (
-        <Popover
-            initialFocusRef={initialFocusRef}
-            placement="right"
-            closeOnBlur={false}
-        >
-            <PopoverTrigger>
-                <IconButton
-                    w="fit-content"
-                    size="lg"
-                    isRound={true}
-                    variant="solid"
-                    colorScheme="blue"
-                    aria-label="sticker"
-                    icon={<ChevronDownIcon/>}
-                />
-            </PopoverTrigger>
-            <PopoverContent color='white' bg='blue.800' borderColor='blue.800' w="fit-content">
-                <PopoverArrow />
-                <SimpleGrid columns={2} padding={6} spacing={6} >
-                    <Box bg="white" w="48px" h="48px"></Box>
-                    <Box bg="white" w="48px" h="48px"></Box>
-                    <Box bg="white" w="48px" h="48px"></Box>
-                    <Box bg="white" w="48px" h="48px"></Box>
-                    <Box bg="white" w="48px" h="48px"></Box>
-                    <Box bg="white" w="48px" h="48px"></Box>
-                </SimpleGrid>
-            </PopoverContent>
-        </Popover>
+        <Box border="1px solid green">
+            <Popover
+                initialFocusRef={initialFocusRef}
+                placement="right"
+                closeOnBlur={false}
+            >
+                <PopoverTrigger>
+                    <IconButton
+                        w="fit-content"
+                        size="lg"
+                        isRound={true}
+                        variant="solid"
+                        colorScheme="blue"
+                        aria-label="sticker"
+                        icon={<ChevronDownIcon/>}
+                    />
+                </PopoverTrigger>
+                <PopoverContent color='white' bg='blue.800' borderColor='blue.800' w="fit-content">
+                    <PopoverArrow bg='blue.800'/>
+                    <SimpleGrid columns={2} padding={6} spacing={6} >
+                        <StickerButton
+                            onClick={(event) => {
+                                dispatch({
+                                    type:'ADD_STICKER',
+                                    id: (index.current++),
+                                    image:'sticker/hi.png',
+                                    x: event.clientX,
+                                    y: event.clientY,
+                                });
+                            }}
+                            stickerSrc="sticker/hi.png"
+                        />
+                        <StickerButton 
+                            onClick={(event) => {
+                                dispatch({
+                                    type:'ADD_STICKER',
+                                    id: (index.current++),
+                                    image:'sticker/lol.png',
+                                    x: event.clientX,
+                                    y: event.clientY,
+                                });
+                            }}
+                            stickerSrc="sticker/lol.png"
+                        />
+                    </SimpleGrid>
+                </PopoverContent>
+            </Popover>
+        </Box>
     );
 };
 
@@ -98,10 +136,10 @@ const PopoverColorPicker = ({ changeTo, defaultColor }) => {
                 </PopoverBody>
             </PopoverContent>
         </Popover>
-    )
-}
+    );
+};
 
-const IconNavigation = ({ onPickColor, pickColor }) => {
+const IconNavigation = ({ onPickColor, pickColor, dispatch }) => {
     const { isOpen, onToggle } = useDisclosure();
 
     return (
@@ -131,7 +169,9 @@ const IconNavigation = ({ onPickColor, pickColor }) => {
                         }}
                         defaultColor={pickColor}
                     />
-                    <PopoverSticker />
+                    <PopoverSticker 
+                        dispatch={dispatch}
+                    />
                 </Stack>
             </Collapse>
         </Stack>
@@ -186,6 +226,38 @@ const SendPage = () => {
     const [receiverName, setReceiverName] = useState('');
     const [senderName, setSenderName] = useState('');
 
+    // 스티커 관리 변수 및 함수
+    const initialState = [];
+
+    function reducer(state, action) {
+        switch(action.type) {
+            case 'ADD_STICKER':
+                return [...state, {
+                    id: action.id,
+                    x: action.x,
+                    y: action.y,
+                    image: action.image,
+                }];
+            case 'REMOVE_STICKER':
+                return state.filter((el) => action.id !== el.id);
+            case 'MOVE_STICKER':
+                return state.splice(action.id - 1, action.id, {
+                    id: action.id,
+                    x: action.x,
+                    y: action.y,
+                    image: action.image,
+                });
+            default:
+                return state;
+        };
+    }
+
+    const [stickers, dispatch] = useReducer(reducer, initialState);
+
+    useEffect(() => {
+        console.log(stickers);
+    }, [stickers]);
+
     return (
         <Box
             w="100vw"
@@ -193,9 +265,31 @@ const SendPage = () => {
             bgGradient="linear(to-tr, blue.100, gray.50)"
             paddingTop="10em"
         >
+            {/* 스티커를 개수만큼 생성하기 위함 */}
+            {stickers.map((element, index) => (
+                <Sticker 
+                    key={index}
+                    onDragEnd={(data) => {
+                        
+                    }}
+                    content={(
+                        <Image
+                            position="absolute"
+                            zIndex={3}
+                            key={index}
+                            src={element.image}
+                            w="52px"
+                            h="52px"
+                        />
+                    )}
+                    x={element.x}
+                    y={element.y}
+                />
+            ))}
             <IconNavigation
                 onPickColor={(color) => setBgColor(color)}
                 pickColor={bgColor}
+                dispatch={dispatch}
             />
             <Card
                 bg="white"
@@ -227,7 +321,6 @@ const SendPage = () => {
                         fontSize="32px"
                         fontWeight="bold"
                     />
-
                     <Stack direction="row-reverse" w="auto">
                         <Input 
                             w="fit-content"
@@ -250,7 +343,6 @@ const SendPage = () => {
                             />
                             <MenuList>
                                 <MenuItem minH="40px">
-                                    
                                 </MenuItem>
                             </MenuList>
                         </Menu>
