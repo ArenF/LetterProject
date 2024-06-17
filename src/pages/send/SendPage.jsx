@@ -47,12 +47,10 @@ const PopoverSticker = () => {
             <PopoverContent color='white' bg='blue.800' borderColor='blue.800' w="fit-content">
                 <PopoverArrow />
                 <SimpleGrid columns={2} padding={6} spacing={6} >
-                    <Box bg="white" w="48px" h="48px"></Box>
-                    <Box bg="white" w="48px" h="48px"></Box>
-                    <Box bg="white" w="48px" h="48px"></Box>
-                    <Box bg="white" w="48px" h="48px"></Box>
-                    <Box bg="white" w="48px" h="48px"></Box>
-                    <Box bg="white" w="48px" h="48px"></Box>
+                    <StickerComponent id={"1"} content={{
+                        id: 1,
+                        context:"data"
+                    }} />
                 </SimpleGrid>
             </PopoverContent>
         </Popover>
@@ -186,6 +184,8 @@ const SendPage = () => {
     const [receiverName, setReceiverName] = useState('');
     const [senderName, setSenderName] = useState('');
 
+    
+
     return (
         <Box
             w="100vw"
@@ -227,7 +227,6 @@ const SendPage = () => {
                         fontSize="32px"
                         fontWeight="bold"
                     />
-
                     <Stack direction="row-reverse" w="auto">
                         <Input 
                             w="fit-content"
@@ -250,7 +249,6 @@ const SendPage = () => {
                             />
                             <MenuList>
                                 <MenuItem minH="40px">
-                                    
                                 </MenuItem>
                             </MenuList>
                         </Menu>
