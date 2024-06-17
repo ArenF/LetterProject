@@ -1,7 +1,6 @@
 import { ChevronDownIcon, HamburgerIcon, SunIcon } from "@chakra-ui/icons";
 import { Box, Stack, Card, Text, Input, Textarea, InputGroup, InputRightElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Editable, EditableInput, EditablePreview, useDisclosure, Collapse, Show, Popover, PopoverTrigger, PopoverContent, Portal, PopoverArrow, PopoverBody, PopoverFooter, PopoverHeader, PopoverCloseButton, ButtonGroup, Button, FormControl, FormLabel, Select, Avatar, SimpleGrid, Image } from "@chakra-ui/react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getStorage, ref } from "firebase/storage";
 import React, { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { ChromePicker, SketchPicker } from "react-color";
 import { useNavigate } from "react-router-dom";
@@ -128,7 +127,7 @@ const PopoverColorPicker = ({ changeTo, defaultColor }) => {
                 <PopoverBody w="auto">
                     <SketchPicker 
                         color={bgColor}
-                        onChangeComplete={(color, event) => {
+                        onChange={(color, event) => {
                             setBgColor(color.hex);
                             changeTo(color.hex);
                         }}
@@ -165,7 +164,6 @@ const IconNavigation = ({ onPickColor, pickColor, dispatch }) => {
                     <PopoverColorPicker 
                         changeTo={(rgb) => {
                             onPickColor(rgb);
-                            console.log(rgb);
                         }}
                         defaultColor={pickColor}
                     />
@@ -182,21 +180,23 @@ const SendPage = () => {
     // 텍스트를 가져와서 해당 값들을
     // height를 scrollHeight로 자동 수정하는 것
     
-    // const textRef = useRef();
-    // const handleResizeHeight = useCallback(() => {
+    const textRef = useRef();
+    const handleResizeHeight = useCallback(() => {
 
-    //     if ((textAreaData.max * 16) > textRef.current.scrollHeight) {
-    //         // 기본 25em으로 초기화 
-    //         textRef.current.style.height = textAreaData.min + "em";
-    //         textRef.current.style.height = textRef.current.scrollHeight + "px";
-    //     } 
-    // });
+        if ((textAreaData.max * 16) > textRef.current.scrollHeight) {
+            // 기본 25em으로 초기화 
+            textRef.current.style.height = textAreaData.min + "em";
+            textRef.current.style.height = textRef.current.scrollHeight + "px";
+        } 
+    });
 
-    // // 마운트할 때 단 한번 실행
-    // useEffect(() => {
-    //     textRef.current.style.height = textAreaData.min + "em";
-    // }, []);
+    // 마운트할 때 단 한번 실행
+    useEffect(() => {
+        textRef.current.style.height = textAreaData.min + "em";
+    }, []);
 
+
+    // 로그인 되어 있지 않으면 그냥 로그인 페이지로 보냄
     const navigate = useNavigate();
 
     const auth = getAuth();
@@ -207,12 +207,6 @@ const SendPage = () => {
                 navigate('/login');
             }
         });
-    }, []);
-
-    useEffect(() => {
-        const storage = getStorage();
-        const pathRef = ref(storage, 'profile');
-
     }, []);
 
     const [date, setDate] = useState(new Date().toLocaleString());
@@ -335,22 +329,67 @@ const SendPage = () => {
                     {/*  */}
                     <Stack direction="row" w='auto'>
                         {/* 프리뷰 위치 */}
-                        <Stack direction="row">
-                            <Text></Text>
+                        <Stack direction="row" zIndex={2}>
+                            <FormControl>
+                                <FormLabel>보내는 사람</FormLabel>
+                                <InputGroup size='md'>
+                                    <Input 
+                                        value={receiverName}
+                                        onChange={(event) => setReceiverName(event.target.value)}
+                                        placeholder=""
+                                    />
+                                    <InputRightElement>
+                                        <Menu>
+                                            <MenuButton 
+                                                as={IconButton}
+                                                aria-label="Options"
+                                                icon={<HamburgerIcon/>}
+                                                variant='outline'
+                                            />
+                                            <MenuList>
+                                                <MenuItem
+                                                    onClick={() => {
+                                                        setReceiverName("Lena Henson");
+                                                    }}
+                                                >
+                                                    <Image 
+                                                        boxSize="2rem"
+                                                        borderRadius='full'
+                                                        src="https://placekitten.com/100/100"
+                                                        alt="Fluffybuns the destroyer"
+                                                        mr="12px"
+                                                    />
+                                                    <Text>Lena Henson</Text>
+                                                </MenuItem>
+                                            </MenuList>
+                                        </Menu>
+                                    </InputRightElement>
+                                </InputGroup>
+                            </FormControl>
                         </Stack>
-                        
                     </Stack>
                     <Textarea 
                         backgroundColor="transparent"
                         placeholder="내용을 입력하세요"
                         value={contexts}
                         border="none"
-                        onChange={(event) => setContexts(event.target.value)}
-                        size='lg'
-                        minH={textAreaData.min + "em"} maxH={textAreaData.max + "em"}
+                        onChange={(event) => {
+                            setContexts(event.target.value);
+                            handleResizeHeight();
+                        }}
+                        ref={textRef}
                         fontSize="1.2rem"
                         resize="none"
                     />
+
+                    <Stack 
+                        w="full" 
+                        align='center'
+                        justifyContent='center' 
+                        direction="row"
+                    >
+                        <Button colorScheme="blue">Send</Button>
+                    </Stack>
                 </Stack>
             </Card>
         </Box>
