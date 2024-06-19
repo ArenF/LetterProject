@@ -2,6 +2,7 @@ import { Text, Heading, Box, Card, CardHeader, Grid, GridItem, CardBody, Avatar,
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from "firebase/firestore";
 import React, { useEffect, useRef, useState } from "react";
+import { getProfile } from "../../db/ProfileDB";
 
 
 const TabRow = ({rows, colorMode}) => {
@@ -35,7 +36,6 @@ const TabRow = ({rows, colorMode}) => {
 };
 
 const LetterPage = (uid) => {
-    const db = getFirestore();
     // doc 함수에 오류가 있어서 잠시 주석처리함
     // const uidRef = doc(db, "profile", uid);
 
@@ -69,7 +69,7 @@ const LetterPage = (uid) => {
 
 const Profile = () => {
     const [photoUrl, setPhotoUrl] = useState('');
-    const userRef = useRef();
+    const [displayName, setDisplayName] = useState('');
 
     const auth = getAuth();
     
@@ -77,7 +77,8 @@ const Profile = () => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setPhotoUrl(user.photoURL);
-                userRef.current = user;
+                setDisplayName(user.displayName);
+                getProfile(user.uid);
             }
         });
     }, []);
@@ -115,7 +116,7 @@ const Profile = () => {
                             <Heading
                                 size='lg'
                             >
-                                Text
+                                {displayName}
                             </Heading>
                         </GridItem>
                         <GridItem colSpan={4}>

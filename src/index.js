@@ -7,6 +7,7 @@ import theme from "./theme";
 import App from "./App";
 import { getStorage } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
+import { readProfileDocument } from "./db/ProfileDB";
 
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_APP_KEY,
