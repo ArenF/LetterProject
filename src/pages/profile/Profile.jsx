@@ -2,6 +2,7 @@ import { Text, Heading, Box, Card, CardHeader, Grid, GridItem, CardBody, Avatar,
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from "firebase/firestore";
 import React, { useEffect, useRef, useState } from "react";
+import { getFriends, getProfile } from "../../db/ProfileDB";
 
 
 const TabRow = ({rows, colorMode}) => {
@@ -77,7 +78,9 @@ const Profile = () => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setPhotoUrl(user.photoURL);
-                userRef.current = user;
+                setDisplayName(user.displayName);
+                const profileData = getFriends(user.uid);
+                console.log(profileData);
             }
         });
     }, []);
