@@ -1,9 +1,9 @@
-import { Text, Heading, Box, Card, CardHeader, Grid, GridItem, CardBody, Avatar, Tabs, TabPanels, TabPanel, TabList, Tab, useColorModeValue, VStack } from "@chakra-ui/react";
+import { Link as ChakraLink, Text, Heading, Box, Card, CardHeader, Grid, GridItem, Avatar, Tabs, TabPanels, TabPanel, TabList, Tab, useColorModeValue, Stack, Icon } from "@chakra-ui/react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from "firebase/firestore";
-import React, { useEffect, useRef, useState } from "react";
-import { getFriends, getProfileIfExists } from "../../db/ProfileDB";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getLettersWithReceiverId } from "../../db/LetterDB";
+import { CheckIcon } from "@chakra-ui/icons";
 
 
 const TabRow = ({rows, colorMode}) => {
@@ -36,36 +36,55 @@ const TabRow = ({rows, colorMode}) => {
     )
 };
 
-const LetterPage = (uid) => {
-    const db = getFirestore();
-    // doc 함수에 오류가 있어서 잠시 주석처리함
-    // const uidRef = doc(db, "profile", uid);
+const LetterPage = () => {
 
-    // useEffect(() => {
-    //     getDoc(uidRef)
-    //         .then((snapshot) => {
-    //             if (!snapshot.exists()) {
-    //                 // 비동기 함수이기에 작동한다고 바로 값이 나오지 않음
-    //                 setDoc(uidRef, {
-    //                     friendsPoint:{
-    //                         "":0,
-    //                         "":0,
-    //                     },
-    //                     level:1
-    //                 });
+    const auth = getAuth();
+    const navigate = useNavigate();
 
+    const [letters, setLetters] = useState([]);
 
-    //             }
-    //         })
-    //         .catch((error) => {
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const uid = user.uid;
+                getLettersWithReceiverId(uid).then((value) => {
+                    value.forEach(el => {
+                        const data = el.data();
+                        data["id"] = el.id;
+                        setLetters([...letters, data]);
+                    });
+                    return;
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            } else {
+                alert("로그인 되어 있지 않습니다.");
+                navigate('/login');
+            }
+        });
+    }, []);
 
-    //         });
-    // }, [uidRef]);
+    useEffect(() => {
+        console.log(letters);
+        console.log(letters.length);
+    }, [letters]);
 
     return (
-        <VStack>
-
-        </VStack>
+        <Stack direction="column">
+            {letters.map((letter, index) => (
+                <Stack key={index} direction="row" align="baseline">
+                    <Icon as={CheckIcon} color="green" />
+                    <ChakraLink
+                        onClick={() => {
+                            navigate('/mail', { state:{ received:true, letterId:letter.id } });
+                        }}
+                    >
+                        {letter.title}
+                    </ChakraLink>
+                </Stack>
+            ))}
+        </Stack>
     );
 };
 

@@ -1,4 +1,4 @@
-import { setDoc, addDoc, getDocs, collection, getFirestore, doc, getDoc, query, where } from "firebase/firestore";
+import { setDoc, addDoc, getDocs, collection, getFirestore, doc, getDoc, query, where, runTransaction } from "firebase/firestore";
 
 // collection 는 doc의 집합
 // doc은 컬렉션 중 하나의 doc이다.
@@ -57,5 +57,22 @@ const writeNewProfileIfNotExists = async ({displayName, uid}) => {
     //         writeNewProfile({displayName, uid});
     // });
 }
+
+const writeData = async (doc, changedObject) => {
+    try {
+        await runTransaction(db, async (transaction) => {
+            const sfDoc = await transaction.get(doc);
+
+            if (!sfDoc.exists()) {
+                throw "Document does not exist!";
+            }
+            const fPoint = sfDoc.data().friendPoint;
+            transaction.update(doc, { friendPoint: [...fPoint, changedObject]});
+        });
+        console.log("Transaction successfully committed");
+    } catch(e) {
+        console.log("Transaction failed: " + e);
+    }
+};
 
 export { getProfileIfExists, getFriends, writeNewProfile, writeNewProfileIfNotExists };

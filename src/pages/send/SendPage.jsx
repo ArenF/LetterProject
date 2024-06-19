@@ -256,7 +256,7 @@ const SendPage = () => {
             w="100vw"
             h="100vh"
             bgGradient="linear(to-tr, blue.100, gray.50)"
-            paddingTop="10em"
+            paddingTop="5em"
         >
             {/* 스티커를 개수만큼 생성하기 위함 */}
             {stickers.map((element, index) => (
@@ -331,7 +331,7 @@ const SendPage = () => {
                         {/* 프리뷰 위치 */}
                         <Stack direction="row" zIndex={2}>
                             <FormControl>
-                                <FormLabel>보내는 사람</FormLabel>
+                                <FormLabel>받는 사람</FormLabel>
                                 <InputGroup size='md'>
                                     <Input 
                                         value={receiverName}
