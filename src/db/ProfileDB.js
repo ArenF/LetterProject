@@ -1,10 +1,14 @@
-import { setDoc, addDoc, getDocs, collection, getFirestore, doc, getDoc } from "firebase/firestore";
+import { setDoc, addDoc, getDocs, collection, getFirestore, doc, getDoc, query, where } from "firebase/firestore";
 
-const getDB = () => {
-    return getFirestore();
+// collection 는 doc의 집합
+// doc은 컬렉션 중 하나의 doc이다.
+
+const allProfiles = async () => {
+    const db = getFirestore();
+    return collection(db, "profiles");
 }
 
-const getProfile = async (id) => {
+const getProfileIfExists = async (id) => {
     const db = getFirestore();
     const docRef = doc(db, "profiles", id);
     const docSnap = await getDoc(docRef);
@@ -15,9 +19,9 @@ const getProfile = async (id) => {
         console.log("not connected");
         return null;
     }
-}
+};
 
-const getFriends = (id) => {
+const getFriends = async (id) => {
     const profile = getProfile(id);
     profile.then((value) => {
         console.log(Object.keys(value.friendPoint));
@@ -25,6 +29,33 @@ const getFriends = (id) => {
     .catch((err) => {
         console.log(err);
     });
+};
+
+const writeNewProfile = async ({displayName, uid}) => {
+    const db = getFirestore();
+    await setDoc(doc(db, "profiles", uid), {
+        displayName: displayName,
+        uid: uid,
+        friendPoint: {},
+    });
 }
 
-export { getProfile, getFriends };
+const writeNewProfileIfNotExists = async ({displayName, uid}) => {
+    getProfileIfExists(uid).then((value) => {
+        if (value == null) {
+            writeNewProfile({displayName, uid});
+        };
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+    // const profiles = allProfiles();
+    // const querySnapshot = await getDocs(profiles);
+
+    // querySnapshot.forEach((doc) => {
+    //     if (doc.id === uid) 
+    //         writeNewProfile({displayName, uid});
+    // });
+}
+
+export { getProfileIfExists, getFriends, writeNewProfile, writeNewProfileIfNotExists };

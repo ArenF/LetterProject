@@ -3,6 +3,7 @@ import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { Box, Card, CardBody, HStack, VStack, Heading, Button, Input, InputGroup, InputRightElement, Text, Image, Link as ChakraLink } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { getProfileIfExists, writeNewProfileIfNotExists } from "../../db/ProfileDB";
 
 const Login = () => {
     const auth = getAuth();
@@ -40,6 +41,10 @@ const Login = () => {
                 setLoginFailed(false);
                 const user = userCredential.user;
                 console.log(user);
+                writeNewProfileIfNotExists({
+                    displayName: user.displayName,
+                    uid: user.uid,
+                });
                 navigate('/');
             })
             .catch((error) => {

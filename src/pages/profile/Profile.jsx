@@ -2,7 +2,8 @@ import { Text, Heading, Box, Card, CardHeader, Grid, GridItem, CardBody, Avatar,
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from "firebase/firestore";
 import React, { useEffect, useRef, useState } from "react";
-import { getFriends, getProfile } from "../../db/ProfileDB";
+import { getFriends, getProfileIfExists } from "../../db/ProfileDB";
+import { useNavigate } from "react-router-dom";
 
 
 const TabRow = ({rows, colorMode}) => {
@@ -70,7 +71,9 @@ const LetterPage = (uid) => {
 
 const Profile = () => {
     const [photoUrl, setPhotoUrl] = useState('');
-    const userRef = useRef();
+    const [displayName, setDisplayName] = useState('');
+    
+    const navigate = useNavigate();
 
     const auth = getAuth();
     
@@ -79,8 +82,8 @@ const Profile = () => {
             if (user) {
                 setPhotoUrl(user.photoURL);
                 setDisplayName(user.displayName);
-                const profileData = getFriends(user.uid);
-                console.log(profileData);
+            } else {
+                navigate('/login');
             }
         });
     }, []);
@@ -118,7 +121,7 @@ const Profile = () => {
                             <Heading
                                 size='lg'
                             >
-                                Text
+                                {displayName}
                             </Heading>
                         </GridItem>
                         <GridItem colSpan={4}>

@@ -87,6 +87,8 @@ const NavBar = () => {
                 setPhotoUrl(user.photoURL == null ? '' : user.photoURL);
             } else {
                 setShowLoader(false);
+                setDisplayName('');
+                setPhotoUrl(null);
             }
         });
     }, []);
