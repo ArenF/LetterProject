@@ -41,10 +41,6 @@ const Login = () => {
                 setLoginFailed(false);
                 const user = userCredential.user;
                 console.log(user);
-                writeNewProfileIfNotExists({
-                    displayName: user.displayName,
-                    uid: user.uid,
-                });
                 navigate('/');
             })
             .catch((error) => {
@@ -132,7 +128,7 @@ const Login = () => {
                                 </InputGroup>
                                 <ChakraLink as={RouterLink} w='100%' to="/signup">
                                     <Text color='red' w='100%' textAlign='right' fontSize='xs'>
-                                        비밀번호를 잊으셨나요?
+                                        회원가입을 해야하나요?
                                     </Text>
                                 </ChakraLink>
                             </VStack>

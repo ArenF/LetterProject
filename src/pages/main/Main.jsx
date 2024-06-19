@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Text, VStack, HStack, Heading, Button, UnorderedList, ListItem, Image, SimpleGrid, ListProps } from "@chakra-ui/react";
-import { EmailIcon, PhoneIcon } from "@chakra-ui/icons";
+import { AttachmentIcon, CalendarIcon, EmailIcon, PhoneIcon } from "@chakra-ui/icons";
+import { useNavigate } from "react-router-dom";
 
 const IconTextBox = ({Icon, subtitle, context}) => (
   <VStack
@@ -8,7 +9,6 @@ const IconTextBox = ({Icon, subtitle, context}) => (
     position="relative"
     w="30rem"
     h="auto"
-    border="1px solid red"
     spacing={5}
     align="stretch"
   >
@@ -100,6 +100,8 @@ const DescriptionTextFormats = ({title, description, list, Button}) => {
 };
 
 const Main = () => {
+  const navigate = useNavigate();
+
   return (
     <Box
       w={"100vw"}
@@ -129,7 +131,11 @@ const Main = () => {
           우리 안에 있는 사랑은 표현을 원한다.
           편지는 우정의 지속적인 표현이다.
         </Text>
-        <Button>
+        <Button
+          onClick={() => {
+            navigate('/login');
+          }}
+        >
           바로가기
         </Button>
 
@@ -145,7 +151,7 @@ const Main = () => {
               "직접 선택하는 편지지 색상!",
               "온라인으로 볼 수 있는 모든 폰트들을 사용!"
             ]}
-            Button={<Button colorScheme="gray">편지 보내러 가기</Button>}
+            Button={<Button onClick={() => navigate('/send')}>편지 보내러 가기</Button>}
           />
         }
         rightContent={
@@ -164,7 +170,7 @@ const Main = () => {
               "최소 30분, 최대 24시간",
               "원하는 날짜를 선택해 원하는 날과 시간에 도착하게 해보세요!"
             ]}
-            Button={<Button>편지 보내러 가기</Button>}
+            Button={<Button onClick={() => navigate('/send')} >편지 보내러 가기</Button>}
           />
         }
         leftContent={
@@ -174,23 +180,40 @@ const Main = () => {
           />
         }
       />
-      <SimpleGrid 
-        column={2} spacing={10}
-        padding="2rem"
+      <HStack
+        padding="5em"
+        w="auto"
+        spacing="10em"
+        justifyContent="center"
+        alignItems="center"
       >
-        <IconTextBox 
-          Icon={
-            <EmailIcon/>
-          }
-          subtitle="이메일로도 간단히 볼 수 있게!"
-          context={"가입하지 않은 상대면 이메일로 간단히 보낼 수 있어요!"}
-        />
-        <IconTextBox 
-          Icon={<PhoneIcon/>}
-          subtitle="친구 추가"
-          context={"친구 추가 기능을 통해 친구를 추가해보세요! 서로서로 교환하는 편지는 친구창을 통해 볼 수 있습니다!"}
-        />
-      </SimpleGrid>
+        <VStack spacing={10} >
+          <IconTextBox 
+            Icon={
+              <EmailIcon/>
+            }
+            subtitle="이메일로도 간단히 볼 수 있게!"
+            context={"가입하지 않은 상대면 이메일로 간단히 보낼 수 있어요!"}
+          />
+          <IconTextBox 
+            Icon={<PhoneIcon/>}
+            subtitle="친구 추가"
+            context={"친구 추가 기능을 통해 친구를 추가해보세요! 서로서로 교환하는 편지는 친구창을 통해 볼 수 있습니다!"}
+          />
+        </VStack>
+        <VStack spacing={10} >
+          <IconTextBox 
+            Icon={<CalendarIcon/>}
+            subtitle="예약형 메세지"
+            context={"편지가 도착할 때까지의 기다림의 시간을 만끽하세요."}
+          />
+          <IconTextBox 
+            Icon={<AttachmentIcon/>}
+            subtitle="템플릿"
+            context={"다양하고 이쁜 템플릿을 사용해보세요!"}
+          />
+        </VStack>
+      </HStack>
     </Box>
   );
 };
