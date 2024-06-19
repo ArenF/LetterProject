@@ -3,7 +3,7 @@ import { setDoc, addDoc, getDocs, collection, getFirestore, doc, getDoc, query, 
 // collection 는 doc의 집합
 // doc은 컬렉션 중 하나의 doc이다.
 
-const allProfiles = async () => {
+const allProfiles = () => {
     const db = getFirestore();
     return collection(db, "profiles");
 }
@@ -20,6 +20,13 @@ const getProfileIfExists = async (id) => {
         return null;
     }
 };
+
+const getProfilesWithName = async (name) => {
+    const q = query(allProfiles(), where("displayName", "==", name));
+
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs;
+}
 
 const getFriends = async (id) => {
     const profile = getProfile(id);
@@ -75,4 +82,4 @@ const writeData = async (doc, changedObject) => {
     }
 };
 
-export { getProfileIfExists, getFriends, writeNewProfile, writeNewProfileIfNotExists };
+export { getProfileIfExists, getFriends, writeNewProfile, getProfilesWithName, writeNewProfileIfNotExists };

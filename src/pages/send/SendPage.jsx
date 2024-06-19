@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useReducer, useRef, useState } from "rea
 import { ChromePicker, SketchPicker } from "react-color";
 import { useNavigate } from "react-router-dom";
 import Sticker from "../../components/sticker/Sticker";
+import { addNewLetter } from "../../db/LetterDB";
 
 const textAreaData = {
     min: 25,
@@ -205,11 +206,13 @@ const SendPage = () => {
         onAuthStateChanged(auth, (user) => {
             if (user === null) {
                 navigate('/login');
+            } else {
+                setSenderName(user.displayName);
             }
         });
     }, []);
 
-    const [date, setDate] = useState(new Date().toLocaleString());
+    const [date, setDate] = useState(new Date());
     const [bgColor, setBgColor] = useState("#DCD6F7");
     const [contexts, setContexts] = useState('');
     const [title, setTitle] = useState('TITLE');
@@ -318,7 +321,7 @@ const SendPage = () => {
                     <Stack direction="row-reverse" w="auto">
                         <Input 
                             w="fit-content"
-                            value={date}
+                            value={date.toLocaleString("ko-kr")}
                             variant="flushed"
                             size="sm"  
                             readOnly
@@ -388,7 +391,26 @@ const SendPage = () => {
                         justifyContent='center' 
                         direction="row"
                     >
-                        <Button colorScheme="blue">Send</Button>
+                        <Button colorScheme="blue"
+                            onClick={() => {
+                                addNewLetter({
+                                    title: title,
+                                    context: contexts,
+                                    writtenDate: date,
+                                    receiverName: receiverName,
+                                    senderName: senderName,
+                                    background: bgColor,
+                                    stickers: stickers,
+                                })
+                                .then((value) => {
+                                    alert(`보내졌습니다. ID : ${value}`);
+                                })
+                                .catch((err) => console.error(err));
+
+                            }}
+                        >
+                            Send
+                        </Button>
                     </Stack>
                 </Stack>
             </Card>

@@ -2,8 +2,8 @@ import { Link as ChakraLink, Text, Heading, Box, Card, CardHeader, Grid, GridIte
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getLettersWithReceiverId } from "../../db/LetterDB";
-import { CheckIcon } from "@chakra-ui/icons";
+import { getLettersWithReceiverId, getLettersWithSenderId } from "../../db/LetterDB";
+import { CheckIcon, EmailIcon } from "@chakra-ui/icons";
 
 
 const TabRow = ({rows, colorMode}) => {
@@ -36,8 +36,7 @@ const TabRow = ({rows, colorMode}) => {
     )
 };
 
-const LetterPage = () => {
-
+const SentPage = () => {
     const auth = getAuth();
     const navigate = useNavigate();
 
@@ -47,13 +46,12 @@ const LetterPage = () => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const uid = user.uid;
-                getLettersWithReceiverId(uid).then((value) => {
+                getLettersWithSenderId(uid).then((value) => {
                     value.forEach(el => {
                         const data = el.data();
                         data["id"] = el.id;
                         setLetters([...letters, data]);
                     });
-                    return;
                 })
                 .catch((err) => {
                     console.log(err);
@@ -74,7 +72,58 @@ const LetterPage = () => {
         <Stack direction="column">
             {letters.map((letter, index) => (
                 <Stack key={index} direction="row" align="baseline">
-                    <Icon as={CheckIcon} color="green" />
+                    <Icon as={EmailIcon} color="green" />
+                    <ChakraLink
+                        onClick={() => {
+                            navigate('/mail', { state:{ received:false, letterId:letter.id } });
+                        }}
+                    >
+                        {letter.title}
+                    </ChakraLink>
+                </Stack>
+            ))}
+        </Stack>
+    );
+}
+
+const ReceivedPage = () => {
+
+    const auth = getAuth();
+    const navigate = useNavigate();
+
+    const [letters, setLetters] = useState([]);
+
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const uid = user.uid;
+                getLettersWithReceiverId(uid).then((value) => {
+                    value.forEach(el => {
+                        const data = el.data();
+                        data["id"] = el.id;
+                        setLetters([...letters, data]);
+                    });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            } else {
+                alert("로그인 되어 있지 않습니다.");
+                navigate('/login');
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        console.log(letters);
+        console.log(letters.length);
+    }, [letters]);
+
+    return (
+        <Stack direction="column">
+            {letters.map((letter, index) => (
+                <Stack key={index} direction="row" align="baseline">
+                    <Icon as={EmailIcon} color="green" />
                     <ChakraLink
                         onClick={() => {
                             navigate('/mail', { state:{ received:true, letterId:letter.id } });
@@ -153,10 +202,10 @@ const Profile = () => {
                         tabs:["보낸 편지", "받은 편지", "친구", "친구 요청"],
                         panels:[
                             (
-                                <LetterPage/>
+                                <ReceivedPage/>
                             ), 
                             (
-                                <Text>2번</Text>
+                                <SentPage/>
                             ), 
                             (
                                 <Text>3번</Text>
