@@ -1,5 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const DotEnv = require('dotenv-webpack');
 
 const port = process.env.PORT || 3000;
 
@@ -19,7 +21,11 @@ const config = {
             // 번들링시 그대로 가져갈 html 파일
           	// 해당 html 파일에는 react 가 렌더링할 HTMLElement 가 있어야한다.
 			template: "public/index.html",
-		})
+		}),
+        new MiniCssExtractPlugin(),
+        new DotEnv({
+            path: '.env'
+        }),
 	],
 	module: {
 		rules: [
@@ -32,7 +38,7 @@ const config = {
 			{
               	// css에 대한 설정
 				test: /\.css$/i,
-				use: ["css-loader", "postcss-loader"],
+				use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
 			},
 			{
 				test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,

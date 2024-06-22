@@ -1,10 +1,14 @@
 import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Main from "./main/Main";
 
 const App = ():JSX.Element => {
     return (
-        <div>
-            <h1></h1>
-        </div>
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Main/>}/>
+            </Routes>
+        </BrowserRouter>
     );
 };
 
