@@ -1,9 +1,14 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./page/App";
-
+// firebase
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+
+import {
+    ChakraProvider,
+    extendTheme
+} from "@chakra-ui/react";
 
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_API_KEY,
@@ -20,8 +25,11 @@ const analytics = getAnalytics(app);
 
 const root = createRoot(document.getElementById("root") as Element);
 
+const theme = extendTheme({
+});
+
 root.render(
-    <React.StrictMode>
+    <ChakraProvider theme={theme}>
         <App />
-    </React.StrictMode>
+    </ChakraProvider>
 );
