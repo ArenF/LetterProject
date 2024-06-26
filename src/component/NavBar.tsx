@@ -1,5 +1,4 @@
 import { Stack } from "@chakra-ui/react";
-import React from "react";
 
 const NavBar = ():JSX.Element => {
     return (
@@ -21,7 +20,7 @@ const NavBar = ():JSX.Element => {
             <Stack
                 w="auto"
                 h="max-content"
-                direction="row"
+                direction="row-reverse"
                 border="1px solid red"
             >
                 

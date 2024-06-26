@@ -25,8 +25,7 @@ const analytics = getAnalytics(app);
 
 const root = createRoot(document.getElementById("root") as Element);
 
-const theme = extendTheme({
-});
+const theme = extendTheme({});
 
 root.render(
     <ChakraProvider theme={theme}>
