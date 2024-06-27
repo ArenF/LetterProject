@@ -2,6 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const DotEnv = require('dotenv-webpack');
+const CopyPlugin = require("copy-webpack-plugin");
 
 const port = process.env.PORT || 3000;
 
@@ -15,6 +16,7 @@ const config = {
         port: port,
         open: true,
         host: "localhost", 
+		historyApiFallback: true,
     },
     plugins: [
 		new HtmlWebpackPlugin({
@@ -26,6 +28,11 @@ const config = {
         new DotEnv({
             path: '.env'
         }),
+		new CopyPlugin({
+			patterns: [
+				{ from: 'static' }
+			]
+		})
 	],
 	module: {
 		rules: [

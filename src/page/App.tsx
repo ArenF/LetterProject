@@ -4,6 +4,7 @@ import Main from "./main/Main";
 import NavBar from "src/component/NavBar";
 import { Provider } from "react-redux";
 import { useStore } from "src/store/useStore";
+import SignUp from "./signup/SignUp";
 
 const App = ():JSX.Element => {
     const store = useStore();
@@ -14,6 +15,7 @@ const App = ():JSX.Element => {
                 <NavBar />
                 <Routes>
                     <Route path="/" element={<Main/>}/>
+                    <Route path="/signup" element={<SignUp/>} />
                 </Routes>
             </BrowserRouter>
         </Provider>
