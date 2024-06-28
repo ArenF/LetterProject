@@ -28,7 +28,7 @@ type PhotoUrlInputAction = Action<"photoInput"> & {
 type ClearAction = Action<"clear">;
 
 const initialState:LoginState = {
-    email: 'string',
+    email: '',
     password: '',
     name: '',
     photoUrl: '',

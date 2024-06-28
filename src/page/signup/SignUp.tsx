@@ -1,7 +1,7 @@
-import { Box, Button, Card, CardBody, FormControl, FormErrorMessage, FormHelperText, FormLabel, Input, InputGroup, InputRightElement, Progress, Show, Stack, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, useSteps } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Box, Button, Card, CardBody, FormControl, FormErrorMessage, FormHelperText, FormLabel, Input, InputGroup, InputRightElement, Progress, Show, Stack, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, flexbox, useSteps } from "@chakra-ui/react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { LoginState } from "src/reducer/login";
+import { LoginState, LoginActions } from "src/reducer/login";
 
 const steps = [
     { title: "First", description: "Input" },
@@ -9,39 +9,64 @@ const steps = [
     { title: "Third", description: "Check" },
 ];
 
+type LoginBodyType = {
+    children: ReactNode
+}
+
+const LoginBody = ({children}:LoginBodyType):JSX.Element => (
+    <Stack
+        direction="column"
+        padding={4}
+        align="stretch"
+        position="relative"
+        display="flex"
+    >
+        {children}
+    </Stack>
+);
+
+const InputNameAndPhoto = ():JSX.Element => {
+    return (
+        <LoginBody>
+            <Input 
+
+            />
+        </LoginBody>
+    );
+};
+
 const InputLogin = ():JSX.Element => {
-    const [email, setEmail] = useState('');
     const [passwordShow, setPasswordShow] = useState(false);
 
     const dispatch = useDispatch(); 
-
-    const loginEmail = useSelector<LoginState, string>((loginState) => loginState.email);
+    // combineReducers를 설정하면 object 형태로 reducer의 state 데이터가 저장됨
+    const state = useSelector<any, LoginState>((state) => state.login);
+    // state.login 을 통해 loginState 데이터를 불러옴
+    const email = state.email;
+    const password = state.password;
 
     useEffect(() => {
-        console.log(loginEmail);
-        console.log(email); 
+        console.log(email);
     }, [email]);
 
-    const emailErrorChecker = true;
-    const passwordErrorChecker = true;
+    const emailErrorChecker = email === '';
+    const passwordErrorChecker = password === '';
 
     return (
-        <Stack
-            direction="column"
-            padding={4}
-            align="stretch"
-        >
+        <LoginBody>
             <FormControl isInvalid={emailErrorChecker}>
                 <FormLabel>Enter the Email</FormLabel>
                 <Input
                     type="email"
+                    placeholder="Enter the email"
+                    value={email}
                     onChange={(e) => {
                         const em = e.target.value;
-                        setEmail(em);
                         dispatch({
                             type: "emailInput",
                             email: em,
                         });
+
                     }}
                 />
                 {!emailErrorChecker ? (
@@ -60,7 +85,13 @@ const InputLogin = ():JSX.Element => {
                         pr='4.5rem'
                         type={passwordShow ? 'text' : 'password'}
                         placeholder="Enter the password"
-                        onChange={(e) => {}}
+                        value={password}
+                        onChange={(e) => {
+                            dispatch({
+                                type: "passwordInput",
+                                password: e.target.value,
+                            })
+                        }}
                     />
                     <InputRightElement width='4.5rem'>
                         <Button 
@@ -86,12 +117,12 @@ const InputLogin = ():JSX.Element => {
             <Button
                 colorScheme='blue'
                 onClick={() => {
-                    
+
                 }}
             >
                 Next
             </Button>
-        </Stack>
+        </LoginBody>
     );
 };
 
