@@ -1,7 +1,9 @@
-import { Box, Button, Card, CardBody, FormControl, FormErrorMessage, FormHelperText, FormLabel, Input, InputGroup, InputRightElement, Progress, Show, Stack, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, flexbox, useSteps } from "@chakra-ui/react";
-import { ReactNode, useCallback, useEffect, useState } from "react";
+import { Avatar, Box, Button, Card, CardBody, FormControl, FormErrorMessage, FormHelperText, FormLabel, Input, InputGroup, InputRightElement, Progress, Show, Stack, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, flexbox, useSteps } from "@chakra-ui/react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { LoginState, LoginActions } from "src/reducer/login";
+import Dropzone from "src/component/DnD/Dropzone";
+import { RegistState } from "src/reducer/regist";
+
 
 const steps = [
     { title: "First", description: "Input" },
@@ -13,43 +15,152 @@ type LoginBodyType = {
     children: ReactNode
 }
 
+const usePager = () => {
+
+    const page = useSelector<any, number>((state) => state.regist.page);
+    const dispatch = useDispatch();
+
+    const { activeStep, setActiveStep } = useSteps({
+        index: page,
+        count: steps.length,
+    });
+
+    function changePage(newPage:number):void {
+        setActiveStep(newPage);
+        dispatch({
+            type: "changePage",
+            page: newPage,
+        });
+    }
+
+    return {page, changePage};
+}
+
 const LoginBody = ({children}:LoginBodyType):JSX.Element => (
     <Stack
+        h="35em"
         direction="column"
         padding={4}
         align="stretch"
-        position="relative"
         display="flex"
+        justifyContent="center" 
+        spacing={16}
     >
         {children}
     </Stack>
 );
 
-const InputNameAndPhoto = ():JSX.Element => {
+const InputLastCheckAll = ():JSX.Element => {
+    const registData = useSelector<any, RegistState>((state) => state.regist);
+    const dispatch = useDispatch();
+    
     return (
         <LoginBody>
-            <Input 
-
-            />
+            <FormControl>
+                <FormLabel>회원가입 하시겠습니까?</FormLabel>
+                <Button
+                    colorScheme="blue"
+                    onClick={() => {
+                        
+                    }}
+                >회원가입</Button>
+            </FormControl>
         </LoginBody>
     );
 };
 
-const InputLogin = ():JSX.Element => {
+const InputNameAndPhoto = (nextPage:() => void):JSX.Element => {
+    const registData = useSelector<any, RegistState>((state) => state.regist);
+    const dispatch = useDispatch();
+
+    return (
+        <LoginBody>
+            <Box
+                position="relative" 
+                w="100%" 
+                h="auto"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+            >
+                <Dropzone
+                    onDrop={(file:File) => {
+                        const url = URL.createObjectURL(file);
+
+                        const fileReader = new FileReader();
+                        fileReader.onload = () => {
+                            const srcData = fileReader.result;
+                            const base = `base64:${srcData}`;
+                            dispatch({
+                                type:"inputPhoto",
+                                photo: base,
+                            })
+                        };
+                        fileReader.readAsDataURL(file);
+
+                        console.log(file);
+                        if (file === undefined || file === null) {
+                            dispatch({
+                                type:"inputPhoto",
+                                photo: '',
+                            })
+                        } else {
+                            dispatch({
+                                type:"inputPhoto",
+                                photo: url,
+                            });
+                        }
+                    }}
+                >
+                    <Avatar
+                        src={registData.photo === '' ? null : registData.photo}
+                        size="2xl"
+                        _hover={{
+                            background: '#424874',
+                            transition: "all 0.5s ease"
+                        }}
+                    />
+                </Dropzone>
+            </Box>
+            <FormControl>
+                <FormLabel>Full Name</FormLabel>
+                <Input 
+                    placeholder="Enter the fullname"
+                    value={registData.name}
+                    onChange={(event) => {
+                        const name = event.target.value;
+                        dispatch({
+                            type:"inputName",
+                            name: name,
+                        })
+                    }}
+                />
+            </FormControl>
+
+            <Button
+                colorScheme="blue"
+                onClick={() => nextPage()}
+            >
+                Next
+            </Button>
+        </LoginBody>
+    );
+};
+
+const InputLogin = (nextPage:() => void):JSX.Element => {
     const [passwordShow, setPasswordShow] = useState(false);
 
     const dispatch = useDispatch(); 
     // combineReducers를 설정하면 object 형태로 reducer의 state 데이터가 저장됨
-    const state = useSelector<any, LoginState>((state) => state.login);
+    const state = useSelector<any, RegistState>((state) => state.regist);
     // state.login 을 통해 loginState 데이터를 불러옴
     const email = state.email;
     const password = state.password;
 
-    useEffect(() => {
-        console.log(email);
-    }, [email]);
+    const emailRegex = '^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$';
+    const regex = new RegExp(emailRegex);
 
-    const emailErrorChecker = email === '';
+    const emailErrorChecker = email === '' || !regex.test(email);
     const passwordErrorChecker = password === '';
 
     return (
@@ -63,21 +174,19 @@ const InputLogin = ():JSX.Element => {
                     onChange={(e) => {
                         const em = e.target.value;
                         dispatch({
-                            type: "emailInput",
+                            type: "inputEmail",
                             email: em,
                         });
-
                     }}
                 />
                 {!emailErrorChecker ? (
                     <FormHelperText>
-                        Enter the email
+                        사용 가능한 이메일입니다.
                     </FormHelperText>
                 ) : (
-                    <FormErrorMessage>Email is Required</FormErrorMessage>
+                    <FormErrorMessage>이메일 형식이 알맞지 않습니다.</FormErrorMessage>
                 )}
             </FormControl>
-
             <FormControl isInvalid={passwordErrorChecker}>
                 <FormLabel>Enter the Password</FormLabel>
                 <InputGroup size='md'>
@@ -88,7 +197,7 @@ const InputLogin = ():JSX.Element => {
                         value={password}
                         onChange={(e) => {
                             dispatch({
-                                type: "passwordInput",
+                                type: "inputPassword",
                                 password: e.target.value,
                             })
                         }}
@@ -105,20 +214,18 @@ const InputLogin = ():JSX.Element => {
                 </InputGroup>
                 {!passwordErrorChecker ? (
                     <FormHelperText>
-                        Enter the password
+                        사용 가능한 비밀번호입니다.
                     </FormHelperText>
                 ) : (
                     <FormErrorMessage>
-                        Password is Required
+                        입력한 형식이 알맞지 않습니다.
                     </FormErrorMessage>
                 )}
             </FormControl>
 
             <Button
-                colorScheme='blue'
-                onClick={() => {
-
-                }}
+                colorScheme="blue"
+                onClick={() => {nextPage()}}
             >
                 Next
             </Button>
@@ -126,17 +233,25 @@ const InputLogin = ():JSX.Element => {
     );
 };
 
+type PageArgument = {
+    pages:Array<JSX.Element>,
+    count:number,
+};
+
+const LoginPage = ({ pages, count }: PageArgument):JSX.Element => (
+    <Box w='auto' h='auto'>
+        {pages[count]}
+    </Box>
+);
+
 const LoginStep = () => {
-    const { activeStep, setActiveStep } = useSteps({
-        index: 0,
-        count: steps.length,
-    });
+    const {page, changePage} = usePager();
 
     return (
         <Box position="relative">
-            <Stepper size="md" index={activeStep} gap='0'>
+            <Stepper size="md" index={page} gap='0'>
                 {steps.map((step, index) => (
-                    <Step key={index} onClick={() => setActiveStep(index)}>
+                    <Step key={index}>
                         <StepIndicator margin={0} gap='0'>
                             <StepStatus 
                                 complete={<StepIcon/>}
@@ -151,15 +266,14 @@ const LoginStep = () => {
                     </Step>
                 ))}
             </Stepper>
-            { 
-                activeStep == 0 ? (
-                    InputLogin()
-                ) : activeStep == 1 ? (
-                    InputLogin()
-                ) : (
-                    InputLogin()
-                )
-            }
+            <LoginPage 
+                pages={[
+                    (InputLogin(() => {changePage(1)})),
+                    (InputNameAndPhoto(() => {changePage(2)})),
+                    (InputLastCheckAll())
+                ]}
+                count={page}
+            />
         </Box>
     )
 }
