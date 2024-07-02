@@ -1,7 +1,12 @@
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import { Timestamp, doc, getFirestore, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { Timestamp, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
+import { getBlob, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { RegistState } from "src/reducer/regist";
+
+export type ProfileData = {
+    name: string,
+    photo: any,
+}
 
 function base64ToFile(base:string, filename:string):File {
     let arr = base.split(','),
@@ -40,6 +45,27 @@ export async function addProfile(uid:string, registData:RegistState) {
         friends: {},
         profileDate: Timestamp.fromDate(new Date())
     });
+}
 
+export async function getProfile(uid:string) {
+    const storage = getStorage();
+    const db = getFirestore();
+    
+    try {
+        // const photoUrl = await getDownloadURL(ref(storage, "profile/" + uid));
+        const photo = await getBlob(ref(storage, "profile/" + uid));
 
+        const profileRef = doc(db, "profiles", uid);
+        const profileSnapshot = await getDoc(profileRef);
+
+        const result:ProfileData = {
+            name: profileSnapshot.data().displayName,
+            photo: photo,
+        };
+
+        return result;
+
+    } catch(error ) {
+        console.error(error);
+    }
 }

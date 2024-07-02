@@ -1,66 +1,46 @@
 import { Action } from "redux";
 
 export type LoginState = {
-    email: string,
-    password: string,
+    uid: string,
+    name: string,
+    photoUrl: string, 
+};
+
+export type LoginActions = SuccessAction | SignOutAction;
+
+type SuccessAction = Action<"success"> & {
+    uid: string,
     name: string,
     photoUrl: string,
 };
 
-export type LoginActions = EmailInputAction | PasswordInputAction | NameInputAction | PhotoUrlInputAction | ClearAction;
-
-type EmailInputAction = Action<"emailInput"> & {
-    email: string,
-};
-
-type PasswordInputAction = Action<"passwordInput"> & {
-    password: string,
-};
-
-type NameInputAction = Action<"nameInput"> & {
-    name: string,
-};
-
-type PhotoUrlInputAction = Action<"photoInput"> & {
-    photoUrl: string,
-};
-
-type ClearAction = Action<"clear">;
+type SignOutAction = Action<"signout">;
 
 const initialState:LoginState = {
-    email: '',
-    password: '',
+    uid: '',
     name: '',
     photoUrl: '',
-};
+}
 
 export const loginReducer = (
-    state:LoginState = initialState,
-    action:LoginActions
+    state: LoginState = initialState,
+    action: LoginActions,
 ) => {
-    switch (action.type) {
-        case "emailInput":
+    switch(action.type) {
+        case "success":
             return {
                 ...state,
-                email: action.email,
-            };
-        case "passwordInput":
-            return {
-                ...state,
-                password: action.password,
-            };
-        case "nameInput":
-            return {
-                ...state,
+                uid: action.uid,
                 name: action.name,
-            };
-        case "photoInput":
-            return {
-                ...state,
                 photoUrl: action.photoUrl,
             };
-        case "clear": 
-            return state;
+        case "signout":
+            return {
+                ...state,
+                uid: '',
+                name: '',
+                photoUrl: '',
+            }
         default:
             return state;
     }

@@ -9,7 +9,7 @@ export type RegistState = {
     photo: string,
 };
 
-export type RegistActions = ChangePageAction | InputEmailAction | InputPasswordAction | InputNameAction | InputPhotoAction;
+export type RegistActions = ChangePageAction | InputEmailAction | InputPasswordAction | InputNameAction | InputPhotoAction | ClearAction;
 
 type ChangePageAction = Action<"changePage"> & {
     page: number,
@@ -30,6 +30,8 @@ type InputNameAction = Action<"inputName"> & {
 type InputPhotoAction = Action<"inputPhoto"> & {
     photo: string,
 };
+
+type ClearAction = Action<"clear">;
 
 const initialState:RegistState = {
     page: 0,
@@ -69,6 +71,8 @@ export const registerReducer = (
                 ...state,
                 photo: action.photo,
             };
+        case "clear":
+            return initialState;
         default:
             return state;
     }
