@@ -4,6 +4,9 @@ import App from "./page/App";
 // firebase
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 import {
     ChakraProvider,
@@ -22,6 +25,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const firestore = getFirestore(app);
+const storage = getStorage(app);
 
 const root = createRoot(document.getElementById("root") as Element);
 

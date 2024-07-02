@@ -1,7 +1,10 @@
 import { Avatar, Box, Button, Card, CardBody, FormControl, FormErrorMessage, FormHelperText, FormLabel, Input, InputGroup, InputRightElement, Progress, Show, Stack, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, flexbox, useSteps } from "@chakra-ui/react";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Dropzone from "src/component/DnD/Dropzone";
+import { addProfile } from "src/firestore/profileDB";
 import { RegistState } from "src/reducer/regist";
 
 
@@ -51,20 +54,63 @@ const LoginBody = ({children}:LoginBodyType):JSX.Element => (
 );
 
 const InputLastCheckAll = ():JSX.Element => {
+    const navigate = useNavigate();
     const registData = useSelector<any, RegistState>((state) => state.regist);
-    const dispatch = useDispatch();
+    const { page, changePage } = usePager();
+    
+    const [invalid, setInvalid] = useState(false);
+    const [invalidMessage, setInvlaidMessage] = useState('');
+
+    const auth = getAuth();
+
+    const submit = () => {
+        if (registData.email === '' || registData.password === '') {
+            changePage(0); return;
+        }
+        if (registData.name === '' || registData.photo === '') {
+            changePage(1); return;
+        }
+        
+        createUserWithEmailAndPassword(auth, registData.email, registData.password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+
+                addProfile(user.uid, registData);
+
+                navigate('/');
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+
+                setInvalid(true);
+                setInvlaidMessage(errorMessage);
+            })
+    };
     
     return (
         <LoginBody>
-            <FormControl>
-                <FormLabel>회원가입 하시겠습니까?</FormLabel>
-                <Button
-                    colorScheme="blue"
-                    onClick={() => {
-                        
-                    }}
-                >회원가입</Button>
-            </FormControl>
+            <Box
+                w="100%"
+                h="auto"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+            >
+                <FormControl isInvalid={invalid}>
+                    <FormLabel>회원가입 하시겠습니까?</FormLabel>
+                    <Button
+                        colorScheme="blue"
+                        onClick={() => {submit()}}
+                    >회원가입</Button>
+                    {invalid ? (
+                        <FormErrorMessage>{invalidMessage}</FormErrorMessage>
+                    ) : (
+                        ''
+                    ) 
+                    }
+                </FormControl>
+            </Box>
         </LoginBody>
     );
 };
@@ -72,6 +118,20 @@ const InputLastCheckAll = ():JSX.Element => {
 const InputNameAndPhoto = (nextPage:() => void):JSX.Element => {
     const registData = useSelector<any, RegistState>((state) => state.regist);
     const dispatch = useDispatch();
+
+    function toDataURL(url:string, callback:(result:string | ArrayBuffer) => void) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function() {
+            var reader = new FileReader();
+            reader.onloadend = function() {
+                callback(reader.result);
+            }
+            reader.readAsDataURL(xhr.response);
+        }
+        xhr.open('GET', url);
+        xhr.responseType = 'blob';
+        xhr.send();
+    }
 
     return (
         <LoginBody>
@@ -85,31 +145,14 @@ const InputNameAndPhoto = (nextPage:() => void):JSX.Element => {
             >
                 <Dropzone
                     onDrop={(file:File) => {
-                        const url = URL.createObjectURL(file);
-
-                        const fileReader = new FileReader();
-                        fileReader.onload = () => {
-                            const srcData = fileReader.result;
-                            const base = `base64:${srcData}`;
-                            dispatch({
-                                type:"inputPhoto",
-                                photo: base,
-                            })
-                        };
-                        fileReader.readAsDataURL(file);
-
                         console.log(file);
-                        if (file === undefined || file === null) {
+                        const url = URL.createObjectURL(file);
+                        toDataURL(url, (result) => {
                             dispatch({
                                 type:"inputPhoto",
-                                photo: '',
-                            })
-                        } else {
-                            dispatch({
-                                type:"inputPhoto",
-                                photo: url,
+                                photo: result,
                             });
-                        }
+                        });
                     }}
                 >
                     <Avatar
