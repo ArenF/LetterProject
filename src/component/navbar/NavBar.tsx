@@ -1,9 +1,56 @@
 import { Box, Heading, Stack, Text, Link as ChakraLink, Avatar } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
-import { useState } from "react";
+import { Navigate, Link as RouterLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { LoginState } from "src/reducer/login";
+import { ProfileData, getProfile } from "src/firestore/profileDB";
 
 const MiniProfile = ():JSX.Element => {
+    const auth = getAuth();
+    const [user, setUser] = useState(null);
+
+    const dispatch = useDispatch();
+    const loginData = useSelector<any, LoginState>((reducer) => reducer.login);
     const [text, setText] = useState("SIGNUP");
+    const [image, setImage] = useState('');
+
+    useEffect(() => {
+        if (user === null) {
+            onAuthStateChanged(auth, (user) => {
+                console.log(user);
+                setUser(user);
+            })
+        }
+    }, [user]);
+
+    useEffect(() => {
+
+        if (user !== null && !loginData.loggedIn) {
+            
+            getProfile(user.uid)
+            .then((result:ProfileData) => {
+                dispatch({
+                    type: "signin",
+                    uid: user.uid,
+                    name: result.name,
+                    photoUrl: URL.createObjectURL(result.photo),
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+                dispatch({
+                    type: "signout"
+                })
+            })
+        }
+
+        if (user !== null) {
+            setText(loginData.name);
+            setImage(loginData.photoUrl);
+        }
+        
+    }, [loginData, user]);
 
     return (
         <Stack
@@ -13,25 +60,31 @@ const MiniProfile = ():JSX.Element => {
         >
             <Linker 
                 name={text}
-                to="/signup"
+                to={user === null ? "/signup" : "/profile"}
             />
-            <Avatar />
+            <Avatar 
+                src={image}
+            />
         </Stack>
     );
 };
+
+type LinkerType = {
+    name:string,
+    to:string,
+}
  
 const Linker = ({
-    name = "",
-    to = "",
-}):JSX.Element => {
+    name, to
+}:LinkerType):JSX.Element => {
     
     return (
         <Box
             gap={2}
         >
             <ChakraLink 
-                as={RouterLink} 
-                to={`${to}`}
+                as={RouterLink}
+                to={to}
             >
                 <Text
                     fontWeight="bold"
@@ -45,6 +98,8 @@ const Linker = ({
 };
 
 const NavBar = ():JSX.Element => {
+
+    const navigate = useNavigate();
 
     const width = "100vw";
     const height = "6em";

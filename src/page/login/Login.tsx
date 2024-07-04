@@ -4,24 +4,8 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getProfile } from "src/firestore/profileDB";
+import { ProfileData, getProfile } from "src/firestore/profileDB";
 import { LoginState } from "src/reducer/login";
-
-
-function signIn(email:string, password:string) {
-    const auth = getAuth();
-
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-
-            
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-        });
-}
 
 const LoginBody = ():JSX.Element => {
     const [email, setEmail] = useState('');
@@ -123,12 +107,19 @@ const LoginBody = ():JSX.Element => {
                         const user = userCredential.user;
                         
                         getProfile(user.uid)
-                        .then((result) => {
+                        .then((result:ProfileData) => {
                             console.log(result);
+
+                            dispatch({
+                                type: 'signin',
+                                uid: user.uid,
+                                name: result.name,
+                                photoUrl: URL.createObjectURL(result.photo),
+                            });
                         })
                         .catch((error) => {
                             console.error(error);
-                        })
+                        });
 
                         navigate('/');
                         

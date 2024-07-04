@@ -5,7 +5,7 @@ import { RegistState } from "src/reducer/regist";
 
 export type ProfileData = {
     name: string,
-    photo: any,
+    photo: Blob,
 }
 
 function base64ToFile(base:string, filename:string):File {

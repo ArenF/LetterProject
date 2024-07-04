@@ -4,11 +4,12 @@ export type LoginState = {
     uid: string,
     name: string,
     photoUrl: string, 
+    loggedIn: Boolean,
 };
 
 export type LoginActions = SuccessAction | SignOutAction;
 
-type SuccessAction = Action<"success"> & {
+type SuccessAction = Action<"signin"> & {
     uid: string,
     name: string,
     photoUrl: string,
@@ -20,6 +21,7 @@ const initialState:LoginState = {
     uid: '',
     name: '',
     photoUrl: '',
+    loggedIn: false,
 }
 
 export const loginReducer = (
@@ -27,12 +29,13 @@ export const loginReducer = (
     action: LoginActions,
 ) => {
     switch(action.type) {
-        case "success":
+        case "signin":
             return {
                 ...state,
                 uid: action.uid,
                 name: action.name,
                 photoUrl: action.photoUrl,
+                loggedIn: true,
             };
         case "signout":
             return {
@@ -40,6 +43,7 @@ export const loginReducer = (
                 uid: '',
                 name: '',
                 photoUrl: '',
+                loggedIn: false,
             }
         default:
             return state;
