@@ -7,6 +7,7 @@ import { useStore } from "src/store/useStore";
 import SignUp from "./signup/SignUp";
 import Login from "./login/Login";
 import Profile from "./profile/Profile";
+import Logout from "./login/Logout";
 
 const App = ():JSX.Element => {
     const store = useStore();
@@ -20,6 +21,7 @@ const App = ():JSX.Element => {
                     <Route path="/signup" element={<SignUp/>} />
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/profile" element={<Profile/>} />
+                    <Route path="/logout" element={<Logout/>} />
                 </Routes>
             </BrowserRouter>
         </Provider>

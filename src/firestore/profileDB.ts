@@ -1,6 +1,7 @@
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import { Timestamp, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
+import { Timestamp, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore";
 import { getBlob, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { ReactNode } from "react";
 import { RegistState } from "src/reducer/regist";
 
 export type ProfileData = {
@@ -65,7 +66,62 @@ export async function getProfile(uid:string) {
 
         return result;
 
-    } catch(error ) {
+    } catch(error) {
+        console.error(error);
+    }
+}
+
+async function allUids() {
+    const db = getFirestore();
+
+    const snapshot = await getDocs(collection(db, "profiles"));
+    
+    return snapshot.docs.map((value, number) => {
+        const uid = value.id;
+        return uid;
+    });
+}
+
+export async function allProfiles(
+    callback:(list:ProfileData[]) => void = (list) => {},
+) {
+    const uids:string[] = await allUids();
+
+    const profiles:ProfileData[] = await Promise.all(
+        uids.map(async (value, number) => {
+            return await getProfile(value);
+        }),
+    );
+
+    callback(profiles);
+}
+
+export async function getAllProfiles(
+    callback:(list:ProfileData[]) => void = (list) => {},
+) {
+    const db = getFirestore();
+
+    const snapshot = await getDocs(collection(db, "profiles"));
+    
+    // snapshot.forEach((doc) => {
+    //     const profile = getProfile(doc.id);
+    //     profile.then()
+    // });
+
+    try {
+        const snapshot = await getDocs(collection(db, "profiles"));
+        let profiles:ProfileData[] = [];
+        snapshot.forEach(async (doc) => {
+            const profile = await getProfile(doc.id);
+            profiles = [
+                ...profiles,
+                profile,
+            ];
+        });
+
+        callback(profiles);
+        return profiles;
+    } catch (error) {
         console.error(error);
     }
 }

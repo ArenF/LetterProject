@@ -26,6 +26,7 @@ const MiniProfile = ():JSX.Element => {
 
     useEffect(() => {
 
+        // 로그인이 되었으나 로그인된 데이터가 있지 않을 때
         if (user !== null && !loginData.loggedIn) {
             
             getProfile(user.uid)
@@ -45,9 +46,16 @@ const MiniProfile = ():JSX.Element => {
             })
         }
 
+        // 로그인 되었을 때
         if (user !== null) {
             setText(loginData.name);
             setImage(loginData.photoUrl);
+        }
+
+        // 로그인이 되지 않았을 때
+        if (user === null) {
+            setText("SIGNUP");
+            setImage('');
         }
         
     }, [loginData, user]);
@@ -99,8 +107,6 @@ const Linker = ({
 
 const NavBar = ():JSX.Element => {
 
-    const navigate = useNavigate();
-
     const width = "100vw";
     const height = "6em";
 
@@ -113,11 +119,9 @@ const NavBar = ():JSX.Element => {
             name: "만들기",
             to: "/send",
         }, 
-        {
-            name: "로그인",
-            to: "/login"
-        },
     ];
+
+    const loggedIn = useSelector<any, Boolean>((state) => state.login.loggedIn);
 
     return (
         <Stack
@@ -160,6 +164,10 @@ const NavBar = ():JSX.Element => {
                             to={value.to}
                         />
                     ))}
+                    <Linker 
+                        name={loggedIn ? "로그아웃" : "로그인"}
+                        to={loggedIn ? "/logout" : "/login"}
+                    />
                 </Stack>
             </Stack>
         </Stack>
