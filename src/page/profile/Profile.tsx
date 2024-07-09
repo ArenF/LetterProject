@@ -1,34 +1,38 @@
-import { SearchIcon } from "@chakra-ui/icons";
+import { CheckCircleIcon, SearchIcon } from "@chakra-ui/icons";
 import { Avatar, Box, Button, Card, CardBody, CardHeader, IconButton, Input, InputGroup, InputRightElement, SkeletonCircle, SkeletonText, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { sendFriendsRequest } from "src/firestore/friendsRequest";
 import { allProfiles, getProfile, ProfileData } from "src/firestore/profileDB";
 import { LoginState } from "src/reducer/login";
 
 type ProfileElementType = {
+    uid: string,
     name: string,
     photoUrl: string,
 };
 
 const ProfileElement = (
-    { name, photoUrl }:ProfileElementType
+    { uid, name, photoUrl }:ProfileElementType
 ):JSX.Element => {
-    return (
-        <Button
-            variant="link"
-            onClick={() => {
 
-            }}
-            _hover={{
-                background:"#EEE"
-            }}
-            justifyContent='start'
-            padding='0.5rem'
+    const loginData = useSelector<any, LoginState>((state) => state.login);
+
+    return (
+        <Stack
+            direction="row"
+            align='center'
+            spacing={8}
+            justify='stretch'
+            position="relative"
         >
             <Stack
+                position="relative"
+                w="50%"
+                h="100%"
                 direction="row"
                 align='center'
-                spacing={2}
+                justify='stretch'
             >
                 <Avatar 
                     src={photoUrl}
@@ -37,9 +41,27 @@ const ProfileElement = (
                     size={"lg"}
                 >{name}</Text>
             </Stack>
-        </Button>
-    )
-}
+            <Stack
+                position="relative"
+                w="50%"
+                h="100%"
+                direction="row-reverse"
+                align='center'
+                justify='stretch'
+            >
+                <IconButton 
+                    variant='outline'
+                    aria-label="friend request"
+                    icon={<CheckCircleIcon bgSize={10}/>}
+                    color='green'
+                    onClick={() => {
+
+                    }}
+                />
+            </Stack>
+        </Stack>
+    );
+};
 
 const ProfileList = ():JSX.Element => {
 
@@ -84,6 +106,7 @@ const ProfileList = ():JSX.Element => {
                 {profiles.map((value:ProfileData, index) => (
                     <ProfileElement 
                         key={index + 1}
+                        uid={value.uid}
                         name={value.name}
                         photoUrl={URL.createObjectURL(value.photo)}
                     />

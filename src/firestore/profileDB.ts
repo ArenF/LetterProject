@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { RegistState } from "src/reducer/regist";
 
 export type ProfileData = {
+    uid: string,
     name: string,
     photo: Blob,
 }
@@ -48,7 +49,7 @@ export async function addProfile(uid:string, registData:RegistState) {
     });
 }
 
-export async function getProfile(uid:string) {
+export async function getProfile(uid:string):Promise<ProfileData> {
     const storage = getStorage();
     const db = getFirestore();
     
@@ -60,6 +61,7 @@ export async function getProfile(uid:string) {
         const profileSnapshot = await getDoc(profileRef);
 
         const result:ProfileData = {
+            uid: uid,
             name: profileSnapshot.data().displayName,
             photo: photo,
         };
@@ -94,34 +96,4 @@ export async function allProfiles(
     );
 
     callback(profiles);
-}
-
-export async function getAllProfiles(
-    callback:(list:ProfileData[]) => void = (list) => {},
-) {
-    const db = getFirestore();
-
-    const snapshot = await getDocs(collection(db, "profiles"));
-    
-    // snapshot.forEach((doc) => {
-    //     const profile = getProfile(doc.id);
-    //     profile.then()
-    // });
-
-    try {
-        const snapshot = await getDocs(collection(db, "profiles"));
-        let profiles:ProfileData[] = [];
-        snapshot.forEach(async (doc) => {
-            const profile = await getProfile(doc.id);
-            profiles = [
-                ...profiles,
-                profile,
-            ];
-        });
-
-        callback(profiles);
-        return profiles;
-    } catch (error) {
-        console.error(error);
-    }
 }
