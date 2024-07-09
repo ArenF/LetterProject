@@ -1,7 +1,7 @@
 import React from "react";
 
-const Main = ():JSX.Element => {
-    return (
+const Main = () => {
+    return(
         <h1>Hello world</h1>
     );
 };
