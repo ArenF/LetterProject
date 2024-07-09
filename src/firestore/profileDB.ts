@@ -1,9 +1,11 @@
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import { Timestamp, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
+import { Timestamp, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore";
 import { getBlob, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { ReactNode } from "react";
 import { RegistState } from "src/reducer/regist";
 
 export type ProfileData = {
+    uid: string,
     name: string,
     photo: Blob,
 }
@@ -47,7 +49,7 @@ export async function addProfile(uid:string, registData:RegistState) {
     });
 }
 
-export async function getProfile(uid:string) {
+export async function getProfile(uid:string):Promise<ProfileData> {
     const storage = getStorage();
     const db = getFirestore();
     
@@ -59,13 +61,39 @@ export async function getProfile(uid:string) {
         const profileSnapshot = await getDoc(profileRef);
 
         const result:ProfileData = {
+            uid: uid,
             name: profileSnapshot.data().displayName,
             photo: photo,
         };
 
         return result;
 
-    } catch(error ) {
+    } catch(error) {
         console.error(error);
     }
+}
+
+async function allUids() {
+    const db = getFirestore();
+
+    const snapshot = await getDocs(collection(db, "profiles"));
+    
+    return snapshot.docs.map((value, number) => {
+        const uid = value.id;
+        return uid;
+    });
+}
+
+export async function allProfiles(
+    callback:(list:ProfileData[]) => void = (list) => {},
+) {
+    const uids:string[] = await allUids();
+
+    const profiles:ProfileData[] = await Promise.all(
+        uids.map(async (value, number) => {
+            return await getProfile(value);
+        }),
+    );
+
+    callback(profiles);
 }
