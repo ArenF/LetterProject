@@ -1,7 +1,7 @@
 // 편지 제작용 사이드 내비게이션 바 제작
 
 import { CheckCircleIcon, CloseIcon, HamburgerIcon, PlusSquareIcon } from "@chakra-ui/icons";
-import { Box, Card, CardHeader, Heading, Icon, IconButton, IconProps, Popover, PopoverArrow, PopoverBody, PopoverContent, PopoverTrigger, ScaleFade, Stack, useDisclosure } from "@chakra-ui/react";
+import { Box, Card, CardBody, CardFooter, CardHeader, Heading, Icon, IconButton, IconProps, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, ScaleFade, Stack, Text, useDisclosure } from "@chakra-ui/react";
 import { ReactElement, ReactNode, useRef, useState } from "react";
 
 type LetterNavElementType = {
@@ -13,27 +13,44 @@ type LetterNavElementType = {
 const LetterNavElement = ({
     label, element, icon = (<PlusSquareIcon/>)
 }:LetterNavElementType) => {
+    const {
+        isOpen,
+        onOpen,
+        onClose,
+    } = useDisclosure();
     const initialFocusRef = useRef();
 
     return (
-        <Popover
-            initialFocusRef={initialFocusRef}
-            placement='left'
-            closeOnBlur={false}
-        >
-            <PopoverTrigger>
-                <NavButton 
-                    label={`show ${label}`}
-                    icon={icon}
-                />
-            </PopoverTrigger>
-            <PopoverArrow bg='blue.800' />
-            <PopoverContent color="white" bg='blue.800' borderColor='blue.800'>
-                <PopoverBody>
-                    {element}
-                </PopoverBody>
-            </PopoverContent>
-        </Popover>
+        <Box>
+            <Popover
+                isOpen={isOpen}
+                onOpen={onOpen}
+                onClose={onClose}
+                initialFocusRef={initialFocusRef}
+                placement='right'
+                closeOnBlur={false}
+            >
+                <PopoverTrigger>
+                    <IconButton 
+                        isRound={true}
+                        aria-label={`show ${label}`}
+                        icon={icon}
+                    />
+                </PopoverTrigger>
+                {/* Popover arrow 오류나는 경우가 있음 주의 */}
+                <PopoverArrow bg='blue.800' />
+                <PopoverCloseButton />
+                <PopoverContent
+                    color="white" 
+                    bg='blue.800' 
+                    borderColor='blue.800'
+                >
+                    <PopoverBody>
+                        {element}
+                    </PopoverBody>
+                </PopoverContent>
+            </Popover>
+        </Box>
     );
 };
 
@@ -76,13 +93,25 @@ const LetterSideNav = () => {
             >
                 <Stack
                     direction="column"
+                    border="1px solid red"
+                    position="relative"
                 >
                     <LetterNavElement 
                         label="color"
                         element={(
-                            <Box>
-
-                            </Box>
+                            <Card>
+                                <CardHeader>
+                                    <Heading>TITLE</Heading>
+                                </CardHeader>
+                                <CardBody>
+                                    <Text>
+                                        Lorem Ipsum
+                                    </Text>
+                                </CardBody>
+                                <CardFooter>
+                                    Datae
+                                </CardFooter>
+                            </Card>
                         )}
                         icon={<CheckCircleIcon/>}
                     />
