@@ -78,11 +78,11 @@ const LetterSideNav = () => {
                     direction="column"
                 >
                     <LetterNavElement 
-                        label="font"
+                        label="color"
                         element={(
-                            <Card>
-                                
-                            </Card>
+                            <Box>
+
+                            </Box>
                         )}
                         icon={<CheckCircleIcon/>}
                     />
