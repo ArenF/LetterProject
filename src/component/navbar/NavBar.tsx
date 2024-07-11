@@ -117,7 +117,7 @@ const NavBar = ():JSX.Element => {
         },
         {
             name: "만들기",
-            to: "/send",
+            to: "/create",
         }, 
     ];
 
