@@ -42,7 +42,7 @@ const TitleEditable = ({
             <Editable
                 textAlign='center'
                 defaultValue={defaultValue}
-                fontSize='2xl'
+                fontSize='4xl'
                 fontFamily={fontFamily}
                 isPreviewFocusable={false}
             >

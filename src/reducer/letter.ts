@@ -47,7 +47,7 @@ const initialState:LetterState = {
     background: '#FFF3DA',
     content: '',
     stickers: [],
-    fontFamily: 'Ongil-Mitmi',
+    fontFamily: 'Ownglyph_meetme-Rg',
     title: '타이틀'
 };
 

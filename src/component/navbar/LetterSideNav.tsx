@@ -1,11 +1,10 @@
 // 편지 제작용 사이드 내비게이션 바 제작
 
 import { CheckCircleIcon, CloseIcon, HamburgerIcon, PlusSquareIcon } from "@chakra-ui/icons";
-import { Box, Card, CardBody, CardFooter, CardHeader, Heading, Icon, IconButton, IconProps, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Portal, ScaleFade, Stack, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Card, CardBody, CardFooter, CardHeader, Grid, Heading, Icon, IconButton, IconProps, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Portal, ScaleFade, Stack, Text, useDisclosure } from "@chakra-ui/react";
 import { Children, ReactElement, ReactNode, useRef, useState } from "react";
 import { ChromePicker, ColorResult } from "react-color";
-import { Checkboard } from 'react-color/lib/components/common';
-import FontEditor from "../fonts/fontEditor";
+import FontEditor from "../fonts/FontEditor";
 
 type LetterNavElementType = {
     label: string,
@@ -80,7 +79,7 @@ const NavButton = ({
 }
 
 const LetterSideNav = () => {
-    const { isOpen, onToggle } = useDisclosure();
+    const { isOpen, onToggle, } = useDisclosure();
 
     const [color, setColor] = useState('#000');
     const handleChange = (color:ColorResult) => setColor(color.hex);
@@ -119,25 +118,27 @@ const LetterSideNav = () => {
                 icon={isOpen ? (<CloseIcon/>) : (<HamburgerIcon/>)}
                 onClick={() => onToggle()}
             />
-            <ScaleFade
-                initialScale={0.9}
-                in={isOpen}
+            <Stack
+                direction="column"
+                position="relative"
+                marginTop='0.2em'
             >
-                <Stack
-                    direction="column"
-                    position="relative"
-                    marginTop='0.2em'
-                >
-                    {navElements.map((value, index) => (
+                {navElements.map((value, index) => (
+                    <ScaleFade
+                        key={`fade : ${index}`}
+                        delay={index * 0.1}
+                        initialScale={0.9}
+                        in={isOpen}
+                    >
                         <LetterNavElement 
-                            key={index}
+                            key={`letterNav : ${index}`}
                             label={value.label}
                             icon={value.icon}
                             children={value.children}
                         />
-                    ))}
-                </Stack>
-            </ScaleFade>
+                    </ScaleFade>
+                ))}
+            </Stack>
         </Box>
     );
 };

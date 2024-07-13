@@ -10,13 +10,13 @@ type OptionsType = {
 
 const options:OptionsType[] = [
     {
-        value: 'Ongil-Mitmi',
+        value: 'Ownglyph_meetme-Rg',
         text: '밑미 폰트'
     },
     {
         value: 'Ownglyph_ryurue-Rg',
         text: '온글 류류 폰트'
-    },  
+    },
 ];
 
 const FontEditor = () => {
@@ -28,8 +28,7 @@ const FontEditor = () => {
         <Box>
             <FormControl>
                 <FormLabel>폰트 설정</FormLabel>
-                <Select 
-                    placeholder="폰트 설정"
+                <Select
                     onChange={(event) => {
                         const value = event.target.value;
                         console.log(value);
