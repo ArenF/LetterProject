@@ -37,10 +37,16 @@ const FontEditor = () => {
                             fontFamily: value,
                         });
                     }}
-                    background='blue.800'
+                    bgColor='blue.800'
                 >
                     {options.map((opt, index) => (
-                        <option key={index} value={opt.value}>
+                        <option 
+                            key={index} 
+                            value={opt.value}
+                            style={{
+                                backgroundColor: 'blue'
+                            }}
+                        >
                             {opt.text}
                         </option>
                     ))}

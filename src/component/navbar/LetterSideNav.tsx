@@ -2,32 +2,46 @@
 
 import { CheckCircleIcon, CloseIcon, HamburgerIcon, PlusSquareIcon } from "@chakra-ui/icons";
 import { Box, Card, CardBody, CardFooter, CardHeader, Grid, Heading, Icon, IconButton, IconProps, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Portal, ScaleFade, Stack, Text, useDisclosure } from "@chakra-ui/react";
-import { Children, ReactElement, ReactNode, useRef, useState } from "react";
+import { Children, ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 import { ChromePicker, ColorResult } from "react-color";
 import FontEditor from "../fonts/FontEditor";
+import { useDispatch, useSelector } from "react-redux";
+import { LetterState } from "src/reducer/letter";
 
 type LetterNavElementType = {
     label: string,
     children: ReactNode,
     icon: ReactElement,
+    index: number,
 };
 
 const LetterNavElement = ({
-    label, children, icon = (<PlusSquareIcon/>)
+    label, icon, children, index
 }:LetterNavElementType) => {
-    const {
-        isOpen,
-        onOpen,
-        onClose,
-    } = useDisclosure();
+
     const initialFocusRef = useRef();
+
+    const navOpen = useSelector<any, boolean[]>((state) => state.letter.navOpen);
+    const dispatch = useDispatch();
+
+    const open = navOpen[index];
 
     return (
         <Box>
             <Popover
-                isOpen={isOpen}
-                onOpen={onOpen}
-                onClose={onClose}
+                isOpen={open}
+                onOpen={() => {
+                    dispatch({
+                        type:'openNav',
+                        index: index,
+                    });
+                }}
+                onClose={() => {
+                    dispatch({
+                        type:'closeNav',
+                        index: index,
+                    });
+                }}
                 initialFocusRef={initialFocusRef}
                 placement='right'
                 closeOnBlur={false}
@@ -78,11 +92,31 @@ const NavButton = ({
     );
 }
 
+type DisclosureType = {
+    isOpen: boolean;
+    onOpen: () => void;
+    onClose: () => void;
+    onToggle: () => void;
+    isControlled: boolean;
+    getButtonProps: (props?: any) => any;
+    getDisclosureProps: (props?: any) => any;
+};
+
 const LetterSideNav = () => {
     const { isOpen, onToggle, } = useDisclosure();
 
-    const [color, setColor] = useState('#000');
-    const handleChange = (color:ColorResult) => setColor(color.hex);
+    const letterData = useSelector<any, LetterState>((state) => state.letter);
+    const dispatch = useDispatch();
+
+    const [color, setColor] = useState(letterData.background);
+    const handleChange = (color:ColorResult) => {
+        setColor(color.hex)
+
+        dispatch({
+            type: "editBackground",
+            background: color.hex,
+        });
+    };
 
     const navElements:LetterNavElementType[] = [
         {
@@ -96,15 +130,25 @@ const LetterSideNav = () => {
                     />
                 </Box>
             ),
+            index: 0,
         },
         {
             label: 'fonts',
             icon: (<CheckCircleIcon/>),
             children: (
-                <FontEditor />
+                <FontEditor/>
             ),
+            index: 1,
         },
     ];
+
+    useEffect(() => {
+        if (!isOpen) {
+            dispatch({
+                type:'closeAll'
+            });
+        }
+    }, [isOpen]);
     
     return (
         <Box
@@ -133,8 +177,9 @@ const LetterSideNav = () => {
                         <LetterNavElement 
                             key={`letterNav : ${index}`}
                             label={value.label}
-                            icon={value.icon}
                             children={value.children}
+                            icon={value.icon}
+                            index={index}
                         />
                     </ScaleFade>
                 ))}

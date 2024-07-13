@@ -1,4 +1,3 @@
-import { CheckIcon, CloseIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, ButtonGroup, Card, CardBody, CardHeader, Editable, EditableInput, EditablePreview, Flex, IconButton, Input, Textarea, useEditableControls } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import TitleEditable from "src/component/editable/TitleEditable";
@@ -23,7 +22,7 @@ const LetterCreator = () => {
 
             <Card
                 zIndex={1}
-                bg='white'
+                bgColor={letterData.background}
             >
                 <CardHeader>
                     <TitleEditable 

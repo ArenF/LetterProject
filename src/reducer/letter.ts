@@ -1,3 +1,4 @@
+import { ReactElement, ReactNode } from "react";
 import { Action } from "redux";
 
 export type StickerType = {
@@ -13,6 +14,7 @@ export type LetterState = {
     title: string,
     fontFamily: string,
     stickers: StickerType[],
+    navOpen: boolean[],
 };
 
 type EditBackgroundAction = Action<"editBackground"> & {
@@ -37,18 +39,44 @@ type AddStickerAction = Action<"addSticker"> & {
 
 type RemoveStickerAction = Action<"removeSticker"> & {
     sticker: StickerType,
-}
+};
+
+type SetNavAction = Action<"setNav"> & {
+    navOpen: boolean[],
+};
+
+type OpenNavAction = Action<"openNav"> & {
+    index: number,
+};
+
+type CloseNavAction = Action<"closeNav"> & {
+    index: number,
+};
+
+type CloseNavAllAction = Action<"closeAll">;
 
 type ClearAction = Action<"clear">; 
 
-export type LetterActions = EditBackgroundAction | EditContentAction | EditFontAction | EditTitleAction | AddStickerAction | RemoveStickerAction | ClearAction;
+export type LetterActions = 
+    EditBackgroundAction | 
+    EditContentAction | 
+    EditFontAction | 
+    EditTitleAction | 
+    AddStickerAction | 
+    RemoveStickerAction | 
+    SetNavAction |
+    OpenNavAction |
+    CloseNavAction |
+    CloseNavAllAction |
+    ClearAction;
 
 const initialState:LetterState = {
     background: '#FFF3DA',
     content: '',
     stickers: [],
     fontFamily: 'Ownglyph_meetme-Rg',
-    title: '타이틀'
+    title: '타이틀',
+    navOpen: [false, false],
 };
 
 export const LetterReducer = (
@@ -88,12 +116,57 @@ export const LetterReducer = (
         case "removeSticker":
             const remover = action.sticker;
             let removingTarget = state.stickers;
-            removingTarget.filter((value, index) => {
+            removingTarget.filter((value) => {
                 return value !== remover;
             });
             return {
                 ...state,
                 stickers: removingTarget,
+            };
+        case "setNav":
+            return {
+                ...state,
+                navOpen: action.navOpen,
+            };
+        case "openNav":
+            const openList = state.navOpen;
+            const openNavResult = openList.map((value, index) => {
+                if (action.index === index) {
+                    value = true;
+                } else {
+                    value = false;
+                }
+
+                return value;
+            });
+
+            return {
+                ...state,
+                navOpen: openNavResult,
+            };
+        case "closeNav":
+            const closeList = state.navOpen;
+            const closeNavResult = closeList.map((value, index) => {
+                if (action.index === index) {
+                    value = false;
+                };
+
+                return value;
+            });
+
+            return {
+                ...state,
+                navOpen: closeNavResult,
+            };
+        case "closeAll":
+            const closeAllList = state.navOpen;
+            const closeAllResult = closeAllList.map(() => {
+                return false;
+            });
+
+            return {
+                ...state,
+                navOpen: closeAllResult,
             };
         default:
             return state;
