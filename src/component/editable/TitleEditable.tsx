@@ -2,11 +2,12 @@ import { CheckIcon, CloseIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, ButtonGroup, Editable, EditableInput, EditablePreview, Flex, IconButton, Input, useEditableControls } from "@chakra-ui/react";
 
 type TitleEditableType = {
+    fontFamily: string,
     defaultValue: string,
 };
 
 const TitleEditable = ({
-    defaultValue
+    fontFamily, defaultValue
 }:TitleEditableType) => {
 
     function EditableControls():JSX.Element {
@@ -42,8 +43,8 @@ const TitleEditable = ({
                 textAlign='center'
                 defaultValue={defaultValue}
                 fontSize='2xl'
+                fontFamily={fontFamily}
                 isPreviewFocusable={false}
-
             >
                 <EditablePreview />
                 <Input as={EditableInput} />

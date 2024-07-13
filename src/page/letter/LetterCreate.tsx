@@ -1,9 +1,13 @@
 import { CheckIcon, CloseIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, ButtonGroup, Card, CardBody, CardHeader, Editable, EditableInput, EditablePreview, Flex, IconButton, Input, Textarea, useEditableControls } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
 import TitleEditable from "src/component/editable/TitleEditable";
 import LetterSideNav from "src/component/navbar/LetterSideNav";
+import { LetterState } from "src/reducer/letter";
 
 const LetterCreator = () => {
+
+    const letterData = useSelector<any, LetterState>((state) => state.letter);
 
     return (
         <Box
@@ -23,11 +27,14 @@ const LetterCreator = () => {
             >
                 <CardHeader>
                     <TitleEditable 
-                        defaultValue="Title"
+                        fontFamily={letterData.fontFamily}
+                        defaultValue="타이틀"
                     />
                 </CardHeader>
                 <CardBody>
-                    <Textarea 
+                    <Textarea
+                        fontFamily={letterData.fontFamily} 
+                        fontSize='24px'
                         w="40rem"
                         h="32rem"
                         placeholder="편지의 내용을 입력하세요."

@@ -7,11 +7,13 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-
+// chakra-ui
 import {
     ChakraProvider,
     extendTheme
 } from "@chakra-ui/react";
+// fonts
+import "./fonts.css";
 
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_API_KEY,

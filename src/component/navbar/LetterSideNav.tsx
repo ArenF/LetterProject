@@ -1,17 +1,20 @@
 // 편지 제작용 사이드 내비게이션 바 제작
 
 import { CheckCircleIcon, CloseIcon, HamburgerIcon, PlusSquareIcon } from "@chakra-ui/icons";
-import { Box, Card, CardBody, CardFooter, CardHeader, Heading, Icon, IconButton, IconProps, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, ScaleFade, Stack, Text, useDisclosure } from "@chakra-ui/react";
-import { ReactElement, ReactNode, useRef, useState } from "react";
+import { Box, Card, CardBody, CardFooter, CardHeader, Heading, Icon, IconButton, IconProps, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Portal, ScaleFade, Stack, Text, useDisclosure } from "@chakra-ui/react";
+import { Children, ReactElement, ReactNode, useRef, useState } from "react";
+import { ChromePicker, ColorResult } from "react-color";
+import { Checkboard } from 'react-color/lib/components/common';
+import FontEditor from "../fonts/fontEditor";
 
 type LetterNavElementType = {
     label: string,
-    element: ReactNode,
+    children: ReactNode,
     icon: ReactElement,
 };
 
 const LetterNavElement = ({
-    label, element, icon = (<PlusSquareIcon/>)
+    label, children, icon = (<PlusSquareIcon/>)
 }:LetterNavElementType) => {
     const {
         isOpen,
@@ -32,23 +35,25 @@ const LetterNavElement = ({
             >
                 <PopoverTrigger>
                     <IconButton 
+                        size='lg'
                         isRound={true}
                         aria-label={`show ${label}`}
                         icon={icon}
                     />
                 </PopoverTrigger>
                 {/* Popover arrow 오류나는 경우가 있음 주의 */}
-                <PopoverArrow bg='blue.800' />
-                <PopoverCloseButton />
-                <PopoverContent
-                    color="white" 
-                    bg='blue.800' 
-                    borderColor='blue.800'
-                >
-                    <PopoverBody>
-                        {element}
-                    </PopoverBody>
-                </PopoverContent>
+                <Portal>
+                    <PopoverContent
+                        color="white" 
+                        bg='blue.800' 
+                        borderColor='blue.800'
+                    >
+                        <PopoverArrow bg='blue.800' />
+                        <PopoverBody>
+                            {children}
+                        </PopoverBody>
+                    </PopoverContent>
+                </Portal>
             </Popover>
         </Box>
     );
@@ -65,6 +70,7 @@ const NavButton = ({
 }:NavButtonType) => {
     return (
         <IconButton 
+            size='lg'
             isRound={true}
             aria-label={label}
             icon={icon}
@@ -75,12 +81,38 @@ const NavButton = ({
 
 const LetterSideNav = () => {
     const { isOpen, onToggle } = useDisclosure();
+
+    const [color, setColor] = useState('#000');
+    const handleChange = (color:ColorResult) => setColor(color.hex);
+
+    const navElements:LetterNavElementType[] = [
+        {
+            label: "bgcolor",
+            icon: (<CheckCircleIcon/>),
+            children: (
+                <Box>
+                    <ChromePicker
+                        color={color}
+                        onChange={handleChange}
+                    />
+                </Box>
+            ),
+        },
+        {
+            label: 'fonts',
+            icon: (<CheckCircleIcon/>),
+            children: (
+                <FontEditor />
+            ),
+        },
+    ];
     
     return (
         <Box
             position="absolute"
             top="20%"
             left="0%"
+            margin='0.5em'
         >
             <NavButton 
                 label="Toggle Nav Bar"
@@ -93,28 +125,17 @@ const LetterSideNav = () => {
             >
                 <Stack
                     direction="column"
-                    border="1px solid red"
                     position="relative"
+                    marginTop='0.2em'
                 >
-                    <LetterNavElement 
-                        label="color"
-                        element={(
-                            <Card>
-                                <CardHeader>
-                                    <Heading>TITLE</Heading>
-                                </CardHeader>
-                                <CardBody>
-                                    <Text>
-                                        Lorem Ipsum
-                                    </Text>
-                                </CardBody>
-                                <CardFooter>
-                                    Datae
-                                </CardFooter>
-                            </Card>
-                        )}
-                        icon={<CheckCircleIcon/>}
-                    />
+                    {navElements.map((value, index) => (
+                        <LetterNavElement 
+                            key={index}
+                            label={value.label}
+                            icon={value.icon}
+                            children={value.children}
+                        />
+                    ))}
                 </Stack>
             </ScaleFade>
         </Box>

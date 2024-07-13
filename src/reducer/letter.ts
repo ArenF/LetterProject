@@ -11,6 +11,7 @@ export type LetterState = {
     background: string,
     content: string,
     title: string,
+    fontFamily: string,
     stickers: StickerType[],
 };
 
@@ -20,6 +21,10 @@ type EditBackgroundAction = Action<"editBackground"> & {
 
 type EditContentAction = Action<"editContent"> & {
     content: string,
+};
+
+type EditFontAction = Action<"editFont"> & {
+    fontFamily: string,
 };
 
 type EditTitleAction = Action<"editTitle"> & {
@@ -36,12 +41,13 @@ type RemoveStickerAction = Action<"removeSticker"> & {
 
 type ClearAction = Action<"clear">; 
 
-export type LetterActions = EditBackgroundAction | EditContentAction | EditTitleAction | AddStickerAction | RemoveStickerAction | ClearAction;
+export type LetterActions = EditBackgroundAction | EditContentAction | EditFontAction | EditTitleAction | AddStickerAction | RemoveStickerAction | ClearAction;
 
 const initialState:LetterState = {
     background: '#FFF3DA',
     content: '',
     stickers: [],
+    fontFamily: 'Ongil-Mitmi',
     title: '타이틀'
 };
 
@@ -59,6 +65,11 @@ export const LetterReducer = (
             return {
                 ...state,
                 content: action.content,
+            };
+        case "editFont":
+            return {
+                ...state,
+                fontFamily: action.fontFamily,
             };
         case "editTitle":
             return {
