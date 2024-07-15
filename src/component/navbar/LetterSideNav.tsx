@@ -7,6 +7,7 @@ import { ChromePicker, ColorResult } from "react-color";
 import FontEditor from "../fonts/FontEditor";
 import { useDispatch, useSelector } from "react-redux";
 import { LetterState } from "src/reducer/letter";
+import StickerEditor from "../stickers/StickerEditor";
 
 type LetterNavElementType = {
     label: string,
@@ -140,6 +141,14 @@ const LetterSideNav = () => {
             ),
             index: 1,
         },
+        {
+            label: 'stickers',
+            icon: (<CheckCircleIcon/>),
+            children: (
+                <StickerEditor />
+            ),
+            index: 2,
+        }
     ];
 
     useEffect(() => {

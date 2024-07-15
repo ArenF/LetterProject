@@ -1,4 +1,3 @@
-import { ReactElement, ReactNode } from "react";
 import { Action } from "redux";
 
 export type StickerType = {
@@ -63,11 +62,11 @@ export type LetterActions =
     EditFontAction | 
     EditTitleAction | 
     AddStickerAction | 
-    RemoveStickerAction | 
-    SetNavAction |
-    OpenNavAction |
-    CloseNavAction |
-    CloseNavAllAction |
+    RemoveStickerAction |  
+    SetNavAction | 
+    OpenNavAction | 
+    CloseNavAction | 
+    CloseNavAllAction | 
     ClearAction;
 
 const initialState:LetterState = {
@@ -76,7 +75,7 @@ const initialState:LetterState = {
     stickers: [],
     fontFamily: 'Ownglyph_meetme-Rg',
     title: '타이틀',
-    navOpen: [false, false],
+    navOpen: [false, false, false],
 };
 
 export const LetterReducer = (
