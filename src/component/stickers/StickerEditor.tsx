@@ -1,5 +1,7 @@
 import { Box, Button, Image, SimpleGrid } from "@chakra-ui/react";
 import { MouseEventHandler } from "react";
+import { useDispatch } from "react-redux";
+import { StickerType } from "src/reducer/letter";
 
 type StickerMakerType = {
     src: string,
@@ -26,17 +28,41 @@ const StickerMaker = (
 
 const StickerEditor = ():JSX.Element => {
 
+    const dispatch = useDispatch();
+
     const stickers:StickerMakerType[] = [
         {
             src: '/stickers/hi.png',
-            onClick: () => {
+            onClick: (e) => {
+                const sticker = {
+                    image: '/stickers/hi.png',
+                    x: e.clientX,
+                    y: e.clientY,
+                };
 
+                console.log(sticker);
+
+                dispatch({
+                    type:'addSticker',
+                    sticker: sticker,
+                });
             },
         }, 
         {
             src: '/stickers/lol.png',
-            onClick: () => {
+            onClick: (e) => {
+                const sticker = {
+                    image: '/stickers/lol.png',
+                    x: e.clientX,
+                    y: e.clientY,
+                };
 
+                console.log(sticker);
+
+                dispatch({
+                    type:'addSticker',
+                    sticker: sticker,
+                });
             },
         },
     ];
@@ -44,8 +70,8 @@ const StickerEditor = ():JSX.Element => {
     return (
         <SimpleGrid column={2} spacing={4}>
             {stickers.map((value, index) => (
-                <StickerMaker 
-                    key={index}
+                <StickerMaker
+                    key={`${index} sticker`}
                     src={value.src}
                     onClick={value.onClick}
                 />

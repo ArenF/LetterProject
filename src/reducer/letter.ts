@@ -1,7 +1,6 @@
 import { Action } from "redux";
 
 export type StickerType = {
-    id: number,
     image: string,
     x: number,
     y: number,
