@@ -1,4 +1,5 @@
-import { Box, ButtonGroup, Card, CardBody, CardHeader, Editable, EditableInput, EditablePreview, Flex, IconButton, Input, Textarea, useEditableControls } from "@chakra-ui/react";
+import { CalendarIcon } from "@chakra-ui/icons";
+import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, CardHeader, Editable, EditableInput, EditablePreview, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverHeader, PopoverTrigger, Portal, Text, Textarea, useEditableControls } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import TitleEditable from "src/component/editable/TitleEditable";
 import LetterSideNav from "src/component/navbar/LetterSideNav";
@@ -54,6 +55,38 @@ const LetterCreator = () => {
                         onDrop={(event) => { event.preventDefault() }}
                     /> 
                 </CardBody>
+                <CardFooter
+                    display='flex'
+                    justifyContent='center'
+                    alignItems='center'
+                >
+                    <ButtonGroup isAttached>
+                        <Button colorScheme='blue'>
+                            전송
+                        </Button>
+                        <Popover placement="top">
+                            <PopoverTrigger>
+                                <IconButton 
+                                    colorScheme='blue'
+                                    aria-label="Set there Calendar"
+                                    icon={<CalendarIcon/>}
+                                />
+                            </PopoverTrigger>
+                            <Portal>
+                                <PopoverContent>
+                                    <PopoverArrow />
+                                    <PopoverCloseButton />
+                                    <PopoverHeader>
+                                        <Text>보낼 날짜</Text>
+                                    </PopoverHeader>
+                                    <PopoverBody>
+                                        
+                                    </PopoverBody>
+                                </PopoverContent>
+                            </Portal>
+                        </Popover>
+                    </ButtonGroup>
+                </CardFooter>
             </Card>
         </Box>
     );

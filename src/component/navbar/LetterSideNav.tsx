@@ -10,6 +10,7 @@ import { LetterState } from "src/reducer/letter";
 import StickerEditor from "../stickers/StickerEditor";
 
 type LetterNavElementType = {
+    isOpen: boolean,
     label: string,
     children: ReactNode,
     icon: ReactElement,
@@ -17,7 +18,7 @@ type LetterNavElementType = {
 };
 
 const LetterNavElement = ({
-    label, icon, children, index
+    isOpen, label, icon, children, index
 }:LetterNavElementType) => {
 
     const initialFocusRef = useRef();
@@ -32,16 +33,20 @@ const LetterNavElement = ({
             <Popover
                 isOpen={open}
                 onOpen={() => {
-                    dispatch({
-                        type:'openNav',
-                        index: index,
-                    });
+                    if (isOpen) {
+                        dispatch({
+                            type:'openNav',
+                            index: index,
+                        });
+                    }
                 }}
                 onClose={() => {
-                    dispatch({
-                        type:'closeNav',
-                        index: index,
-                    });
+                    if (isOpen) {
+                        dispatch({
+                            type:'closeNav',
+                            index: index,
+                        });
+                    }
                 }}
                 initialFocusRef={initialFocusRef}
                 placement='right'
@@ -93,16 +98,6 @@ const NavButton = ({
     );
 }
 
-type DisclosureType = {
-    isOpen: boolean;
-    onOpen: () => void;
-    onClose: () => void;
-    onToggle: () => void;
-    isControlled: boolean;
-    getButtonProps: (props?: any) => any;
-    getDisclosureProps: (props?: any) => any;
-};
-
 const LetterSideNav = () => {
     const { isOpen, onToggle, } = useDisclosure();
 
@@ -132,6 +127,7 @@ const LetterSideNav = () => {
                 </Box>
             ),
             index: 0,
+            isOpen: false,
         },
         {
             label: 'fonts',
@@ -140,6 +136,7 @@ const LetterSideNav = () => {
                 <FontEditor/>
             ),
             index: 1,
+            isOpen: false,
         },
         {
             label: 'stickers',
@@ -148,6 +145,7 @@ const LetterSideNav = () => {
                 <StickerEditor />
             ),
             index: 2,
+            isOpen: false,
         }
     ];
 
@@ -189,6 +187,7 @@ const LetterSideNav = () => {
                             children={value.children}
                             icon={value.icon}
                             index={index}
+                            isOpen={isOpen}
                         />
                     </ScaleFade>
                 ))}
