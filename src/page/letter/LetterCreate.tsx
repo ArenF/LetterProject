@@ -9,6 +9,7 @@ import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 import { useState } from "react";
 import moment from "moment";
+import TimePicker from "src/component/timepicker/TimePicker";
 
 const LetterCreator = () => {
 
@@ -36,7 +37,7 @@ const LetterCreator = () => {
         {
             name: '시간 설정',
             content: (
-                <Box></Box>
+                <TimePicker />
             ),
         }
     ];

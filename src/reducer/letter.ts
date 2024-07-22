@@ -13,6 +13,7 @@ export type LetterState = {
     fontFamily: string,
     stickers: StickerType[],
     navOpen: boolean[],
+    date: Date,
 };
 
 type EditBackgroundAction = Action<"editBackground"> & {
@@ -53,6 +54,10 @@ type CloseNavAction = Action<"closeNav"> & {
 
 type CloseNavAllAction = Action<"closeAll">;
 
+type SetDateAction = Action<"setDate"> & {
+    date: Date,
+};
+
 type ClearAction = Action<"clear">; 
 
 export type LetterActions = 
@@ -61,11 +66,12 @@ export type LetterActions =
     EditFontAction | 
     EditTitleAction | 
     AddStickerAction | 
-    RemoveStickerAction |  
+    RemoveStickerAction | 
     SetNavAction | 
     OpenNavAction | 
     CloseNavAction | 
     CloseNavAllAction | 
+    SetDateAction |
     ClearAction;
 
 const initialState:LetterState = {
@@ -75,6 +81,7 @@ const initialState:LetterState = {
     fontFamily: 'Ownglyph_meetme-Rg',
     title: '타이틀',
     navOpen: [false, false, false],
+    date: new Date(Date.now() + (1800 * 1000)),
 };
 
 export const LetterReducer = (
@@ -165,6 +172,11 @@ export const LetterReducer = (
             return {
                 ...state,
                 navOpen: closeAllResult,
+            };
+        case "setDate":
+            return {
+                ...state,
+                date: action.date,
             };
         default:
             return state;
