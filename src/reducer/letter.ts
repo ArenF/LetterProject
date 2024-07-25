@@ -6,6 +6,15 @@ export type StickerType = {
     y: number,
 };
 
+export type SerializableDate = {
+    year: number,
+    month: number,
+    day: number,
+    hour: number,
+    minute: number,
+    second: number,
+};
+
 export type LetterState = {
     background: string,
     content: string,
@@ -13,7 +22,7 @@ export type LetterState = {
     fontFamily: string,
     stickers: StickerType[],
     navOpen: boolean[],
-    date: Date,
+    date: SerializableDate,
 };
 
 type EditBackgroundAction = Action<"editBackground"> & {
@@ -54,8 +63,22 @@ type CloseNavAction = Action<"closeNav"> & {
 
 type CloseNavAllAction = Action<"closeAll">;
 
+type SetHourAction = Action<"setHour"> & {
+    hour: number,
+};
+
+type SetMinuteAction = Action<"setMinute"> & {
+    minute: number,
+};
+
+type SetSecondAction = Action<"setSecond"> & {
+    second: number,
+};
+
 type SetDateAction = Action<"setDate"> & {
-    date: Date,
+    year: number,
+    month: number,
+    day: number,
 };
 
 type ClearAction = Action<"clear">; 
@@ -71,8 +94,33 @@ export type LetterActions =
     OpenNavAction | 
     CloseNavAction | 
     CloseNavAllAction | 
-    SetDateAction |
+    SetHourAction | SetMinuteAction | SetSecondAction | SetDateAction |
     ClearAction;
+
+export function serializableToDate(value:SerializableDate):Date {
+    let date:Date = new Date();
+    date.setFullYear(value.year);
+    date.setMonth(value.month);
+    date.setDate(value.day);
+    date.setHours(value.hour);
+    date.setMinutes(value.minute);
+    date.setSeconds(value.second);
+
+    return date;
+}
+
+export function dateToSerialize(date:Date):SerializableDate {
+    const result:SerializableDate = {
+        year: date.getFullYear(),
+        month: date.getMonth(),
+        day: date.getDate(),
+        hour: date.getHours(),
+        minute: date.getMinutes(),
+        second: date.getSeconds(),
+    };
+
+    return result;
+}
 
 const initialState:LetterState = {
     background: '#FFF3DA',
@@ -81,7 +129,7 @@ const initialState:LetterState = {
     fontFamily: 'Ownglyph_meetme-Rg',
     title: '타이틀',
     navOpen: [false, false, false],
-    date: new Date(Date.now() + (1800 * 1000)),
+    date: dateToSerialize(new Date(Date.now() + (1800 * 1000))),
 };
 
 export const LetterReducer = (
@@ -173,10 +221,51 @@ export const LetterReducer = (
                 ...state,
                 navOpen: closeAllResult,
             };
-        case "setDate":
+        case "setHour":
+            let hourResult = state.date;
+            hourResult = {
+                ...hourResult,
+                hour: action.hour,
+            };
+
             return {
                 ...state,
-                date: action.date,
+                date: hourResult,
+            };
+        case "setMinute":
+            let minuteResult = state.date;
+            minuteResult = {
+                ...minuteResult,
+                minute: action.minute,
+            };
+
+            return {
+                ...state,
+                date: minuteResult,
+            };
+        case "setSecond":
+            let secondResult = state.date;
+            secondResult = {
+                ...secondResult,
+                second: action.second,
+            };
+
+            return {
+                ...state,
+                date: secondResult,
+            };
+        case "setDate":
+            let dateResult = state.date;
+            dateResult = {
+                ...dateResult,
+                year: action.year,
+                month: action.month,
+                day: action.day,
+            };
+
+            return {
+                ...state,
+                date: dateResult,
             };
         default:
             return state;

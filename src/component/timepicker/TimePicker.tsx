@@ -2,6 +2,7 @@ import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import { Box, IconButton, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Stack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { SerializableDate, serializableToDate } from "src/reducer/letter";
 
 type TimePickerColumnType = {
     defaultValue: number,
@@ -39,22 +40,39 @@ const TimePickerColumn = ({
 const TimePicker = ():JSX.Element => {
 
     const dispatch = useDispatch();
-    const date = useSelector<any, Date>((state) => state.letter.date);
+    const date = useSelector<any, SerializableDate>((state) => state.letter.date);
+
+    useEffect(() => {
+        const realDate = serializableToDate(date);
+        console.log(realDate);
+    });
 
     return (
         <Stack direction="row">
             <TimePickerColumn 
-                defaultValue={date.getHours()}
+                defaultValue={date.hour}
+                onChange={(s, num) => dispatch({
+                    type: 'setHour',
+                    hour: num,
+                })}
                 max={24}
                 min={1}
             />
             <TimePickerColumn 
-                defaultValue={date.getMinutes()}
+                defaultValue={date.minute}
+                onChange={(s, num) => dispatch({
+                    type: 'setMinute',
+                    minute: num,
+                })}
                 max={59}
                 min={0}
             />
             <TimePickerColumn 
-                defaultValue={date.getSeconds()}
+                defaultValue={date.second}
+                onChange={(s, num) => dispatch({
+                    type: 'setSecond',
+                    second: num,
+                })}
                 max={59}
                 min={0}
             />

@@ -1,10 +1,10 @@
 import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "@chakra-ui/icons";
 import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, CardHeader, Editable, EditableInput, EditablePreview, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, Text, Textarea, useEditableControls } from "@chakra-ui/react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import TitleEditable from "src/component/editable/TitleEditable";
 import LetterSideNav from "src/component/navbar/LetterSideNav";
 import DraggableSticker from "src/component/stickers/DraggableSticker";
-import { LetterState } from "src/reducer/letter";
+import { LetterState, serializableToDate } from "src/reducer/letter";
 import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 import { useState } from "react";
@@ -13,11 +13,14 @@ import TimePicker from "src/component/timepicker/TimePicker";
 
 const LetterCreator = () => {
 
+    const dispatch = useDispatch();
     const letterData = useSelector<any, LetterState>((state) => state.letter);
 
     const stickers = letterData.stickers;
 
-    const [date, setDate] = useState(new Date());
+    const [date, setDate] = useState(
+        serializableToDate(letterData.date).toDateString()
+    );
     const [page, setPage] = useState(0);
 
     const body = [
@@ -25,8 +28,21 @@ const LetterCreator = () => {
             name: '날짜 설정',
             content: (
                 <Calendar 
-                    onChange={(value:Date) => {
-                        setDate(value);
+                    onChange={(value) => {
+                        const val:number = value.valueOf() as number;
+                        const result = new Date(val);
+                        
+                        const month = result.getMonth();
+                        const year = result.getFullYear();
+                        const day = result.getDate();
+
+                        setDate(result.toDateString());
+                        dispatch({
+                            type:'setDate',
+                            year: year,
+                            month: month,
+                            day: day,
+                        });
                     }}
                     value={date}
                     calendarType="gregory"
@@ -82,7 +98,10 @@ const LetterCreator = () => {
                         h="32rem"
                         placeholder="편지의 내용을 입력하세요."
                         resize="none"
-                        onDrop={(event) => { event.preventDefault() }}
+                        onDrop={(event) => { 
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }}
                     /> 
                 </CardBody>
                 <CardFooter
@@ -91,7 +110,7 @@ const LetterCreator = () => {
                     alignItems='center'
                 >
                     <ButtonGroup isAttached>
-                        <Button colorScheme='blue'>
+                        <Button colorScheme='blue' type="submit">
                             전송
                         </Button>
                         <Popover placement="top">
