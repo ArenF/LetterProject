@@ -10,15 +10,7 @@ import 'react-calendar/dist/Calendar.css';
 import { useState } from "react";
 import moment from "moment";
 import TimePicker from "src/component/timepicker/TimePicker";
-import { Formik, Form,  } from "formik";
-
-const NewLetterCeator = ():JSX.Element => {
-
-
-    return (
-        <Box></Box>
-    );
-};
+import TargetSelector from "src/component/targetselector/TargetSelector";
 
 const LetterCreator = () => {
 
@@ -64,7 +56,13 @@ const LetterCreator = () => {
             content: (
                 <TimePicker />
             ),
-        }
+        },
+        {
+            name: '보낼 상대 설정',
+            content: (
+                <TargetSelector/> 
+            ),
+        },
     ];
 
     return (
