@@ -10,6 +10,15 @@ import 'react-calendar/dist/Calendar.css';
 import { useState } from "react";
 import moment from "moment";
 import TimePicker from "src/component/timepicker/TimePicker";
+import { Formik, Form,  } from "formik";
+
+const NewLetterCeator = ():JSX.Element => {
+
+
+    return (
+        <Box></Box>
+    );
+};
 
 const LetterCreator = () => {
 
@@ -110,7 +119,16 @@ const LetterCreator = () => {
                     alignItems='center'
                 >
                     <ButtonGroup isAttached>
-                        <Button colorScheme='blue' type="submit">
+                        <Button
+                            colorScheme='blue' 
+                            type="submit"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+
+                                
+                            }}
+                        >
                             전송
                         </Button>
                         <Popover placement="top">
