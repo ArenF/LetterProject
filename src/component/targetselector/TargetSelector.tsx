@@ -25,15 +25,6 @@ const TargetSelector = ():JSX.Element => {
 
                         console.log(value);
                     }}
-                    _focus={{
-                        background:'blue.800',
-                    }}
-                    _active={{
-                        background:'blue.800',
-                    }}
-                    _hover={{
-                        background:'blue.800',
-                    }}
                     value={target}
                     name="email"
                 />
@@ -43,10 +34,7 @@ const TargetSelector = ():JSX.Element => {
                     </FormHelperText>
                 ) : (
                     <FormErrorMessage>
-                        <Text
-                            color='red.300'
-                            fontSize={"large"}
-                        >보낼 대상의 이메일이 하나라도 있어야 합니다!</Text>
+                        보낼 대상의 이메일이 하나라도 있어야 합니다!
                     </FormErrorMessage>
                 )}
             </FormControl>
