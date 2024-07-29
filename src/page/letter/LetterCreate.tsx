@@ -11,6 +11,7 @@ import { useState } from "react";
 import moment from "moment";
 import TimePicker from "src/component/timepicker/TimePicker";
 import TargetSelector from "src/component/targetselector/TargetSelector";
+import { useNavigate } from "react-router-dom";
 
 const LetterCreator = () => {
 
@@ -19,51 +20,7 @@ const LetterCreator = () => {
 
     const stickers = letterData.stickers;
 
-    const [date, setDate] = useState(
-        serializableToDate(letterData.date).toDateString()
-    );
-    const [page, setPage] = useState(0);
-
-    const body = [
-        {
-            name: '날짜 설정',
-            content: (
-                <Calendar 
-                    onChange={(value) => {
-                        const val:number = value.valueOf() as number;
-                        const result = new Date(val);
-                        
-                        const month = result.getMonth();
-                        const year = result.getFullYear();
-                        const day = result.getDate();
-
-                        setDate(result.toDateString());
-                        dispatch({
-                            type:'setDate',
-                            year: year,
-                            month: month,
-                            day: day,
-                        });
-                    }}
-                    value={date}
-                    calendarType="gregory"
-                    formatDay={(locale, date) => moment(date).format("DD")}
-                />
-            ),
-        },
-        {
-            name: '시간 설정',
-            content: (
-                <TimePicker />
-            ),
-        },
-        {
-            name: '보낼 상대 설정',
-            content: (
-                <TargetSelector/> 
-            ),
-        },
-    ];
+    const navigate = useNavigate();
 
     return (
         <Box
@@ -116,92 +73,23 @@ const LetterCreator = () => {
                     justifyContent='center'
                     alignItems='center'
                 >
-                    <ButtonGroup isAttached>
-                        <Button
-                            colorScheme='blue' 
-                            type="submit"
-                            onSubmit={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
+                    <Button
+                        colorScheme='blue' 
+                        type="submit"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
 
-                                
-                            }}
-                        >
-                            전송
-                        </Button>
-                        <Popover placement="top">
-                            <PopoverTrigger>
-                                <IconButton 
-                                    colorScheme='blue'
-                                    aria-label="Set there Calendar"
-                                    icon={<CalendarIcon/>}
-                                />
-                            </PopoverTrigger>
-                            <Portal>
-                                <PopoverContent bgColor='blue.800'>
-                                    <PopoverArrow bg='blue.800' />
-                                    <PopoverCloseButton color='white' />
-                                    <PopoverHeader>
-                                        <Text color='white'>
-                                            {body[page].name}
-                                        </Text>
-                                    </PopoverHeader>
-                                    <PopoverBody>
-                                        {body[page].content}
-                                    </PopoverBody>
-                                    <PopoverFooter
-                                        border='0'
-                                        display='flex'
-                                        alignItems='center'
-                                        justifyContent='space-between'
-                                        pb={4}
-                                    >
-                                        <Box>
-                                            <Text
-                                                color='white'
-                                            >
-                                                Step {page+1} of {body.length}
-                                            </Text>
-                                        </Box>
-                                        <ButtonGroup>
-                                            <IconButton 
-                                                aria-label="go to previous"
-                                                icon={<ArrowLeftIcon/>}
-                                                color='white'
-                                                bg='blue.800'
-                                                _hover={{
-                                                    bgColor:'blue.700'
-                                                }}
-                                                onClick={() => {
-                                                    const prev = page-1;
-                                                    if (prev < 0) {
-                                                        return;
-                                                    }
-                                                    setPage(prev);
-                                                }}
-                                            />
-                                            <IconButton 
-                                                aria-label="go to next"
-                                                icon={<ArrowRightIcon/>}
-                                                color='white'
-                                                bg='blue.800'
-                                                _hover={{
-                                                    bgColor:'blue.700'
-                                                }}
-                                                onClick={() => {
-                                                    const next = page+1;
-                                                    if (next > body.length-1) {
-                                                        return;
-                                                    }
-                                                    setPage(next);
-                                                }}
-                                            />
-                                        </ButtonGroup>
-                                    </PopoverFooter>
-                                </PopoverContent>
-                            </Portal>
-                        </Popover>
-                    </ButtonGroup>
+                            dispatch({
+                                type: 'setWritten',
+                                writtneDate: Date.now(),
+                            });
+
+                            navigate('/send');
+                        }}
+                    >
+                        전송
+                    </Button>
                 </CardFooter>
             </Card>
         </Box>

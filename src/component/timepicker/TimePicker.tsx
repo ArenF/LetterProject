@@ -5,35 +5,40 @@ import { useDispatch, useSelector } from "react-redux";
 import { SerializableDate, serializableToDate } from "src/reducer/letter";
 
 type TimePickerColumnType = {
-    defaultValue: number,
-    onChange?:(valueAsString:string, valueAsNumber:number) => void,
+    defaultValue: number | string,
+    onChangeNumber?: (value:number) => void,
+    onChange?: (value:string) => void,
+    value?: string,
     max: number,
     min: number,
 };
 
 const TimePickerColumn = ({
-    defaultValue, onChange, max, min
+    defaultValue, onChangeNumber, onChange, value, max, min
 }:TimePickerColumnType):JSX.Element => {
     
     return (
-        <Stack direction='column'>
-            <NumberInput
-                color='white'
-                bg='blue.700'
-                defaultValue={defaultValue}
-                max={max}
-                min={min}
-                size='lg'
-                maxW={32}
-                onChange={onChange}
-            >
-                <NumberInputField />
-                <NumberInputStepper>
-                    <NumberIncrementStepper color='white' />
-                    <NumberDecrementStepper color='white' />
-                </NumberInputStepper>
-            </NumberInput>
-        </Stack>
+        <NumberInput
+            borderRadius='15px'
+            color='white'
+            bg='cyan.600'
+            defaultValue={defaultValue}
+            max={max}
+            min={min}
+            size='lg'
+            maxW={32}
+            onChange={(str, num) => {
+                onChangeNumber(num);
+                onChange(str);
+            }}
+            value={value}
+        >
+            <NumberInputField />
+            <NumberInputStepper>
+                <NumberIncrementStepper color='white' />
+                <NumberDecrementStepper color='white' />
+            </NumberInputStepper>
+        </NumberInput>
     );
 };
 
@@ -47,32 +52,51 @@ const TimePicker = ():JSX.Element => {
         console.log(realDate);
     });
 
+    const [hour, setHour] = useState(`${date.hour}시`);
+    const [minute, setMinute] = useState(`${date.minute}분`);
+    const [second, setSecond] = useState(`${date.second}초`);
+
     return (
-        <Stack direction="row">
+        <Stack 
+            direction="column"
+            spacing="3.5em"
+        >
             <TimePickerColumn 
-                defaultValue={date.hour}
-                onChange={(s, num) => dispatch({
+                defaultValue={hour}
+                onChangeNumber={(num) => dispatch({
                     type: 'setHour',
                     hour: num,
                 })}
+                onChange={(hour) => {
+                    setHour(`${hour}시`);
+                }}
+                value={hour}
                 max={24}
                 min={1}
             />
             <TimePickerColumn 
-                defaultValue={date.minute}
-                onChange={(s, num) => dispatch({
+                defaultValue={minute}
+                onChangeNumber={(num) => dispatch({
                     type: 'setMinute',
                     minute: num,
                 })}
+                onChange={(val) => {
+                    setMinute(`${val}분`);
+                }}
+                value={minute}
                 max={59}
                 min={0}
             />
             <TimePickerColumn 
-                defaultValue={date.second}
-                onChange={(s, num) => dispatch({
+                defaultValue={second}
+                onChangeNumber={(num) => dispatch({
                     type: 'setSecond',
                     second: num,
                 })}
+                onChange={(val) => {
+                    setSecond(`${val}초`);
+                }}
+                value={second}
                 max={59}
                 min={0}
             />

@@ -23,6 +23,7 @@ export type LetterState = {
     stickers: StickerType[],
     navOpen: boolean[],
     date: SerializableDate,
+    writtenDate: number,
     target: string,
 };
 
@@ -86,6 +87,10 @@ type SetTargetAction = Action<"setTarget"> & {
     target: string,
 };
 
+type SetWrittenAction = Action<"setWritten"> & {
+    writtenDate: number,
+};
+
 type ClearAction = Action<"clear">; 
 
 export type LetterActions = 
@@ -101,6 +106,7 @@ export type LetterActions =
     CloseNavAllAction | 
     SetHourAction | SetMinuteAction | SetSecondAction | SetDateAction |
     SetTargetAction |
+    SetWrittenAction |
     ClearAction;
 
 export function serializableToDate(value:SerializableDate):Date {
@@ -136,6 +142,7 @@ const initialState:LetterState = {
     title: '타이틀',
     navOpen: [false, false, false],
     date: dateToSerialize(new Date(Date.now() + (1800 * 1000))),
+    writtenDate: 0,
     target: '',
 };
 
@@ -278,6 +285,11 @@ export const LetterReducer = (
             return {
                 ...state,
                 target: action.target,
+            };
+        case "setWritten":
+            return {
+                ...state,
+                writtenDate: action.writtenDate,
             };
         default:
             return state;

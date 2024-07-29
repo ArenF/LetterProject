@@ -10,6 +10,7 @@ import Profile from "./profile/Profile";
 import Logout from "./login/Logout";
 import Letter from "./letter/Letter";
 import LetterCreator from "./letter/LetterCreate";
+import LetterSender from "./letter/LetterSender";
 
 const App = ():JSX.Element => {
     const store = useStore();
@@ -26,6 +27,7 @@ const App = ():JSX.Element => {
                     <Route path="/logout" element={<Logout/>} />
                     <Route path="/letter" element={<Letter/>} />
                     <Route path="/create" element={<LetterCreator/>} />
+                    <Route path="/send" element={<LetterSender/>} />
                 </Routes>
             </BrowserRouter>
         </Provider>

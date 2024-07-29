@@ -125,6 +125,7 @@ const NavBar = ():JSX.Element => {
 
     return (
         <Stack
+            zIndex={5}
             position="fixed"
             w={width}
             h={height}
