@@ -1,7 +1,8 @@
 import { Avatar, Box, SkeletonCircle, Stack, Text } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import SearchBar from "src/component/search/SearchBar";
-import { getLetters, LetterData } from "src/firestore/lettersDB";
+import { getLettersSent, LetterData } from "src/firestore/lettersDB";
 
 
 type SentLetterElement = {
@@ -13,11 +14,13 @@ const SentLetters = ():JSX.Element => {
 
     const defaultValue:LetterData[] = [];
 
+    const name:string = useSelector<any, string>((state) => state.login.name);
+
     const [letters, setLetters] = useState(defaultValue);
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        getLetters((list) => {
+        getLettersSent(name, (list) => {
             setLetters(list);
             console.log(list);
         });

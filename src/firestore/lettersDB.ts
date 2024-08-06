@@ -69,10 +69,13 @@ export type LetterData = {
     data: DocumentData,
 };
 
-export const getLetters = async (callback?:(list:LetterData[]) => void):Promise<LetterData[]> => {
+export const getLettersSent = async (author:string, callback?:(list:LetterData[]) => void):Promise<LetterData[]> => {
     const db = getFirestore();
 
-    const docsRef = await getDocs(collection(db, "letters"));
+    const docsRef = await getDocs(query(
+        collection(db, "letters"),
+        where("author", "==", author)
+    ));
     const docs = docsRef.docs;
 
     const result = docs.map((value) => ({ 
