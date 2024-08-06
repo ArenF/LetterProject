@@ -3,6 +3,7 @@ import { Avatar, Box, Button, Card, CardBody, CardHeader, IconButton, Input, Inp
 import { useSelector } from "react-redux";
 import { LoginState } from "src/reducer/login";
 import { FriendRequestList } from "./FriendRequest";
+import SentLetters from "./SentLetters";
 
 const TabRow = ():JSX.Element => {
 
@@ -11,7 +12,7 @@ const TabRow = ():JSX.Element => {
             name: "받은 편지",
             content: (
                 <Box>
-                    
+                    <SentLetters />
                 </Box>
             ),
         },

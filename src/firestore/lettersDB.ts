@@ -1,4 +1,4 @@
-import { addDoc, collection, getFirestore, Timestamp } from "firebase/firestore";
+import { addDoc, collection, doc, DocumentData, getDocs, getFirestore, query, Timestamp, where } from "firebase/firestore";
 import { LetterState, serializableToDate, StickerType } from "src/reducer/letter";
 import { LoginState } from "src/reducer/login";
 
@@ -62,4 +62,27 @@ export const sendLetters = async (letter:LetterSendObject, callback?:(args?:call
     } catch(e) {
         console.error(e);
     }
+};
+
+export type LetterData = {
+    id: string,
+    data: DocumentData,
+};
+
+export const getLetters = async (callback?:(list:LetterData[]) => void):Promise<LetterData[]> => {
+    const db = getFirestore();
+
+    const docsRef = await getDocs(collection(db, "letters"));
+    const docs = docsRef.docs;
+
+    const result = docs.map((value) => ({ 
+        id: value.id,
+        data: value.data(),
+    }));
+
+    if (callback !== null) {
+        callback(result);
+    }
+
+    return result;
 };

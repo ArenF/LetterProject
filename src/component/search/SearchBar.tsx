@@ -31,7 +31,7 @@ const SearchBar = ({ data }:SearchArgs):JSX.Element => {
                     />
                 </InputRightElement>
             </InputGroup>
-            <Stack direction='column'>
+            <Stack marginTop='2rem' direction='column'>
                 {data.map((value, number) => {
                     const name = value.name;
 
