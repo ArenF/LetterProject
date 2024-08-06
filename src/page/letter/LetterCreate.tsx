@@ -66,6 +66,14 @@ const LetterCreator = () => {
                             event.preventDefault();
                             event.stopPropagation();
                         }}
+                        onChange={(event) => {
+                            const value = event.target.value;
+
+                            dispatch({
+                                type:'editContent',
+                                content: value,
+                            });
+                        }}
                     /> 
                 </CardBody>
                 <CardFooter
@@ -80,7 +88,7 @@ const LetterCreator = () => {
 
                             dispatch({
                                 type: 'setWritten',
-                                writtneDate: Date.now(),
+                                writtenDate: Date.now(),
                             });
 
                             navigate('/send');

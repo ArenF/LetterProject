@@ -1,19 +1,21 @@
-import { Box, Button, FormControl, FormLabel, Image, Progress, Stack, useInterval } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Card, FormControl, FormLabel, Image, Progress, Stack, Text, useInterval } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import Calendar from "react-calendar";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import TargetSelector from "src/component/targetselector/TargetSelector";
 import TimePicker from "src/component/timepicker/TimePicker";
+import { createLetterSendObject, LetterSendObject, sendLetters } from "src/firestore/lettersDB";
+import { LetterState } from "src/reducer/letter";
+import { LoginState } from "src/reducer/login";
 
 const SenderBody = ():JSX.Element => {
 
-    const [page, setPage] = useState(0);
-    const isSending = useRef(false);
+    const navigate = useNavigate();
+    const letter = useSelector<any, LetterState>((state) => state.letter);
+    const login = useSelector<any, LoginState>((state) => state.login);
 
-    useEffect(() => {
-        if (page === 2) {
-            isSending.current = true;
-        }
-    }, [page]);
+    const [page, setPage] = useState(0);
 
     const body = [
         (
@@ -41,26 +43,34 @@ const SenderBody = ():JSX.Element => {
                     <Calendar />
                     <TimePicker/>
                 </Stack>
-                <Button
-                    colorScheme='teal'
-                    onClick={() => {
-                        setPage(page+1);
-                    }}
-                >
-                    다음
-                </Button>
+                <ButtonGroup flexDirection='row' display='flex'>
+                    <Button
+                        colorScheme='teal'
+                        onClick={() => {
+                            setPage(page-1);
+                        }}
+                    >
+                        이전
+                    </Button>
+                    <Button
+                        colorScheme='teal'
+                        onClick={() => {
+                            const letterData:LetterSendObject = createLetterSendObject(letter, login);
+                            sendLetters(letterData, () => {
+                                navigate('/profile');
+                            });
+                        }}
+                    >
+                        다음
+                    </Button>
+                </ButtonGroup>
             </Stack>
-        ),
-        (
-            <Box>
-                <Progress hasStripe value={80} />
-            </Box>
         ),
     ];
 
     return (
         <Box>{body[page]}</Box>
-    );
+    ); 
 };
  
 const LetterSender = ():JSX.Element => {

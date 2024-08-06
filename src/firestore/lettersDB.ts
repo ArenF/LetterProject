@@ -1,5 +1,6 @@
 import { addDoc, collection, getFirestore, Timestamp } from "firebase/firestore";
 import { LetterState, serializableToDate, StickerType } from "src/reducer/letter";
+import { LoginState } from "src/reducer/login";
 
 export type LetterSendObject = {
     background: string,
@@ -8,6 +9,7 @@ export type LetterSendObject = {
     fontFamily: string,
     stickers: StickerType[],
     target: string,
+    author: string,
     writtenDate: Timestamp,
     sentDate: Timestamp,
 };
@@ -20,30 +22,43 @@ export type createLetterArgs = {
 };
 
 export function createLetterSendObject(
-    state:LetterState
+    letter:LetterState, login:LoginState,
 ):LetterSendObject {
-    const written = new Date(state.writtenDate);
-    const sent = serializableToDate(state.date);
+    const written = new Date(letter.writtenDate);
+    const sent = serializableToDate(letter.date);
 
     return {
-        background: state.background,
-        content: state.content,
-        title: state.title,
-        fontFamily: state.fontFamily,
-        stickers: state.stickers,
-        target: state.target,
+        background: letter.background,
+        content: letter.content,
+        title: letter.title,
+        fontFamily: letter.fontFamily,
+        stickers: letter.stickers,
+        target: letter.target,
+        author: login.name,
         writtenDate: Timestamp.fromDate(written),
         sentDate: Timestamp.fromDate(sent),
     };
 }
 
-const sendLetters = async (letter:LetterSendObject) => {
+type callbacksArgs = {
+    id: string,
+    path: string,
+};
+
+export const sendLetters = async (letter:LetterSendObject, callback?:(args?:callbacksArgs) => void) => {
     const db = getFirestore();
 
     try {
+        console.log(letter);
         const docRef = await addDoc(collection(db, "letters"), letter);
+        
+        const id = docRef.id;
+        const path = docRef.path;
 
-        console.log("Document added Error : ", docRef.id);
+        console.log("Document has completed ", docRef.id);
+        if (callback !== null) {
+            callback({ id,path });
+        }
     } catch(e) {
         console.error(e);
     }
