@@ -1,5 +1,5 @@
-import { Box, Button, FormControl, FormLabel, Image, Stack } from "@chakra-ui/react";
-import { useState } from "react";
+import { Box, Button, FormControl, FormLabel, Image, Progress, Stack, useInterval } from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
 import Calendar from "react-calendar";
 import TargetSelector from "src/component/targetselector/TargetSelector";
 import TimePicker from "src/component/timepicker/TimePicker";
@@ -7,6 +7,13 @@ import TimePicker from "src/component/timepicker/TimePicker";
 const SenderBody = ():JSX.Element => {
 
     const [page, setPage] = useState(0);
+    const isSending = useRef(false);
+
+    useEffect(() => {
+        if (page === 2) {
+            isSending.current = true;
+        }
+    }, [page]);
 
     const body = [
         (
@@ -37,12 +44,17 @@ const SenderBody = ():JSX.Element => {
                 <Button
                     colorScheme='teal'
                     onClick={() => {
-                        
+                        setPage(page+1);
                     }}
                 >
                     다음
                 </Button>
             </Stack>
+        ),
+        (
+            <Box>
+                <Progress hasStripe value={80} />
+            </Box>
         ),
     ];
 
@@ -70,9 +82,7 @@ const LetterSender = ():JSX.Element => {
                 h='10em'
                 src="/mail-dynamic-gradient.png"
             />
-
             <SenderBody />
-
         </Stack>
     );
 };

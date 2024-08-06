@@ -1,5 +1,5 @@
 import { addDoc, collection, getFirestore, Timestamp } from "firebase/firestore";
-import { LetterState, StickerType } from "src/reducer/letter";
+import { LetterState, serializableToDate, StickerType } from "src/reducer/letter";
 
 export type LetterSendObject = {
     background: string,
@@ -20,19 +20,20 @@ export type createLetterArgs = {
 };
 
 export function createLetterSendObject(
-    {
-        state, target, writtenDate, sentDate,
-    }:createLetterArgs
+    state:LetterState
 ):LetterSendObject {
+    const written = new Date(state.writtenDate);
+    const sent = serializableToDate(state.date);
+
     return {
         background: state.background,
         content: state.content,
         title: state.title,
         fontFamily: state.fontFamily,
         stickers: state.stickers,
-        target: target,
-        writtenDate: Timestamp.fromDate(writtenDate),
-        sentDate: Timestamp.fromDate(sentDate),
+        target: state.target,
+        writtenDate: Timestamp.fromDate(written),
+        sentDate: Timestamp.fromDate(sent),
     };
 }
 

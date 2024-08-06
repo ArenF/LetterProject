@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 
 type TargetSelectorArgs = {
-    onClick:React.MouseEventHandler<HTMLButtonElement>,
+    onClick:() => void,
 };
 
 const TargetSelector = (
@@ -57,8 +57,14 @@ const TargetSelector = (
                             type: 'setTarget',
                             target: value,
                         });
+                    }}
+                    onKeyDown={(event) => {
+                        if (event.key !== 'Enter')
+                            return;
+                        if (isError)
+                            return;
 
-                        console.log(value);
+                        onClick();
                     }}
                     value={target}
                     name="email"

@@ -76,9 +76,7 @@ const LetterCreator = () => {
                     <Button
                         colorScheme='blue' 
                         type="submit"
-                        onSubmit={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
+                        onClick={() => {
 
                             dispatch({
                                 type: 'setWritten',
