@@ -1,26 +1,21 @@
-import { SearchIcon } from "@chakra-ui/icons";
-import { Box, IconButton, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
-import { useState } from "react";
+import { Box, Divider, IconButton, Input, InputGroup, InputRightElement, Stack, Text } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 export const FriendList = () => {
-    
-    const [search, setSearch] = useState('');
+
+    const [requests, setRequests] = useState([]);
+    const [friends, setFriends] = useState([]);
+
+    useEffect(() => {
+                
+    }, []);
 
     return (
-        <Box>
-            <InputGroup>
-                <Input 
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-                <InputRightElement>
-                    <IconButton 
-                        aria-label="search"
-                        icon={<SearchIcon/>}
-                        onClick={() => {}}  
-                    />
-                </InputRightElement>
-            </InputGroup>
-        </Box>
+        <Stack direction='column'>
+            <Text color='gray.400'>요청</Text>
+            <Divider />
+            <Text color='gray.400'>친구</Text>
+            <Divider />
+        </Stack>
     );
 };

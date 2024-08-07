@@ -1,6 +1,7 @@
-import { Avatar, Box, SkeletonCircle, Stack, Text } from "@chakra-ui/react";
+import { Avatar, Box, Link as ChakraLink, SkeletonCircle, Stack, Text } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import SearchBar from "src/component/search/SearchBar";
 import { getLettersSent, LetterData } from "src/firestore/lettersDB";
 
@@ -12,6 +13,8 @@ type SentLetterElement = {
 
 const SentLetters = ():JSX.Element => {
 
+    const navigate = useNavigate();
+
     const defaultValue:LetterData[] = [];
 
     const name:string = useSelector<any, string>((state) => state.login.name);
@@ -20,15 +23,12 @@ const SentLetters = ():JSX.Element => {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        getLettersSent(name, (list) => {
-            setLetters(list);
-            console.log(list);
-        });
-    }, []); 
-
-    useEffect(() => {
-        if (letters === null)
+        if (letters.length === 0) {
+            getLettersSent(name, (list) => {
+                setLetters(list);
+            });
             return;
+        }
 
         let result:SentLetterElement[] = [];
 
@@ -49,7 +49,14 @@ const SentLetters = ():JSX.Element => {
                             startColor={data.background}
                             endColor={data.background}
                         />
-                        <Text>{data.title}</Text>
+                        <ChakraLink
+                            fontWeight='bold'
+                            onClick={() => {
+                                navigate('/letter', data.id);
+                            }}
+                        >
+                            {data.title}
+                        </ChakraLink>
                     </Stack>
                 )
             });

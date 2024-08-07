@@ -1,7 +1,7 @@
 import { Stack, Avatar, Text, IconButton, Box, InputGroup, Input, InputRightElement, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 import { CheckCircleIcon, SearchIcon } from "@chakra-ui/icons";
 import { useState, useEffect } from "react";
-import { sendFriendsRequest } from "src/firestore/friendsRequest";
+import { sendFriendsRequest } from "src/firestore/friendsRequestDB";
 import { useSelector } from "react-redux";
 import { LoginState } from "src/reducer/login";
 import { allProfiles, ProfileData } from "src/firestore/profileDB";

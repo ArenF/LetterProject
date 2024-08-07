@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { LoginState } from "src/reducer/login";
 import { FriendRequestList } from "./FriendRequest";
 import SentLetters from "./SentLetters";
+import { FriendList } from "./Friend";
 
 const TabRow = ():JSX.Element => {
 
@@ -12,7 +13,7 @@ const TabRow = ():JSX.Element => {
             name: "받은 편지",
             content: (
                 <Box>
-                    <SentLetters />
+
                 </Box>
             ),
         },
@@ -20,7 +21,7 @@ const TabRow = ():JSX.Element => {
             name: "보낸 편지",
             content: (
                 <Box>
-    
+                    <SentLetters />
                 </Box> 
             )
         },
@@ -28,7 +29,7 @@ const TabRow = ():JSX.Element => {
             name: "친구",
             content: (
                 <Box>
-
+                    <FriendList />
                 </Box>
             )
         },
